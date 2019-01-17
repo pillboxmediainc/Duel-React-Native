@@ -12,11 +12,7 @@ import { WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
 
-export default class HomeScreen extends React.Component {
-  state = {
-    socketConnection: false,
-  };
-
+export default class ChallengeScreen extends React.Component {
   static navigationOptions = {
     title: 'I Challenge You to a Duel',
   };
