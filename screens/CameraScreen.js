@@ -7,8 +7,9 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Camera, Permissions, Constants, FaceDetector } from 'expo';
-
-export default class CameraScreen extends React.Component {
+import { connect } from 'react-redux';
+import { socketFalse } from '../store/reducer';
+class CameraScreen extends React.Component {
   state = {
     hasCameraPermission: null,
     type: Camera.Constants.Type.front,
@@ -141,6 +142,12 @@ export default class CameraScreen extends React.Component {
                 {`${this.state.isFaceOnCrosshairs ? 'hit' : 'miss'}`}
               </Text>
               <TouchableOpacity
+                style={styles.fireButton}
+                onPress={() => this.fire()}
+              >
+                <Text style={styles.fireButtonText}> FIRE </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 style={{
                   flex: 1,
                   flexDirection: 'row',
@@ -148,13 +155,13 @@ export default class CameraScreen extends React.Component {
                   alignSelf: 'flex-end',
                   alignItems: 'flex-end',
                 }}
-                onPress={() => this.fire()}
+                onPress={() => this.props.socketFalse()}
               >
                 <Text
                   style={{ fontSize: 28, marginBottom: 10, color: 'white' }}
                 >
                   {' '}
-                  Fire{' '}
+                  END GAME{' '}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -216,4 +223,31 @@ const styles = StyleSheet.create({
   textcolor: {
     color: '#008080',
   },
+  fireButton: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignSelf: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  fireButtonText: { fontSize: 28, marginBottom: 10, color: 'red' },
 });
+
+// const mapState = state => {
+//   return {
+//     socketConnection: state.socketConnection,
+//   };
+// };
+
+const mapDispatch = dispatch => {
+  return {
+    socketFalse: () => {
+      dispatch(socketFalse());
+    },
+  };
+};
+
+export default connect(
+  null,
+  mapDispatch
+)(CameraScreen);
