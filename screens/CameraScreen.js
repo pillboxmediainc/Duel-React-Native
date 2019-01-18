@@ -42,8 +42,10 @@ class CameraScreen extends React.Component {
           styles.face,
           {
             ...bounds.size,
+
             left: bounds.origin.x,
             top: bounds.origin.y,
+            height: bounds.size.height + 200,
           },
         ]}
       >
@@ -166,7 +168,7 @@ class CameraScreen extends React.Component {
             style={styles.endGameButtonView}
             onPress={() => this.props.socketFalse()}
           >
-            <Text style={styles.endGameButtonText}> END GAME </Text>
+            <Text style={styles.endGameButtonText}> Home </Text>
           </TouchableOpacity>
 
           {/* Fire Button */}

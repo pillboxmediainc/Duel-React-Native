@@ -33,34 +33,35 @@ class ChallengeScreen extends React.Component {
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
         >
-          <View style={styles.challengeButton}>
-            <TouchableOpacity
-              onPress={this.props.socketTrue}
-              style={styles.helpLink}
-            >
-              <Text style={styles.challengeButtonText}>Challenge Opponent</Text>
-            </TouchableOpacity>
+          {/* Game Title */}
+          <View style={styles.gameTitle}>
+            <Text style={styles.tabBarInfoText}>
+              I Challange You to a Duel! v1.0.0
+            </Text>
           </View>
 
-          <View style={styles.acceptChallengeButton}>
-            <TouchableOpacity
-              onPress={this.props.socketTrue}
-              style={styles.helpLink}
-            >
-              <Text style={styles.acceptChallengeButtonText}>
-                Accept Challenge
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {/* Challeng Opponent Button */}
+          <TouchableOpacity
+            onPress={this.props.socketTrue}
+            style={styles.challengeButtonView}
+          >
+            <Text style={styles.challengeButtonText}>Challenge Opponent</Text>
+          </TouchableOpacity>
+
+          {/* Accept Challenge Button */}
+          <TouchableOpacity
+            onPress={this.props.socketTrue}
+            style={styles.acceptChallengeButtonView}
+          >
+            <Text style={styles.acceptChallengeButtonText}>
+              Accept Challenge
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.tabBarInfoContainerTop}>
-          <Text style={styles.tabBarInfoText}>I Challange You to a Duel!</Text>
-        </View>
-
-        <View style={styles.tabBarInfoContainerBottom}>
+        <View style={styles.bottomInfo}>
           <Text style={styles.tabBarInfoText}>
-            Helpful information for User can go here.
+            Challenge an Opponent to a duel!
           </Text>
         </View>
       </View>
@@ -73,109 +74,73 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  // developmentModeText: {
-  //   marginBottom: 20,
-  //   color: 'rgba(0,0,0,0.4)',
-  //   fontSize: 14,
-  //   lineHeight: 19,
-  //   textAlign: 'center',
-  // },
   contentContainer: {
     paddingTop: 30,
   },
-  // welcomeContainer: {
-  //   alignItems: 'center',
-  //   marginTop: 10,
-  //   marginBottom: 20,
-  // },
-  // welcomeImage: {
-  //   width: 100,
-  //   height: 80,
-  //   resizeMode: 'contain',
-  //   marginTop: 3,
-  //   marginLeft: -10,
-  // },
-  // getStartedContainer: {
-  //   alignItems: 'center',
-  //   marginHorizontal: 50,
-  // },
-  // homeScreenFilename: {
-  //   marginVertical: 7,
-  // },
-  // codeHighlightText: {
-  //   color: 'rgba(96,100,109, 0.8)',
-  // },
-  // codeHighlightContainer: {
-  //   backgroundColor: 'rgba(0,0,0,0.05)',
-  //   borderRadius: 3,
-  //   paddingHorizontal: 4,
-  // },
-  // gameTitle: {
-  //   fontSize: 17,
-  //   color: 'rgba(96,100,109, 1)',
-  //   lineHeight: 24,
-  //   textAlign: 'center',
-  //   marginVertical: 90,
-  // },
-  tabBarInfoContainerTop: {
+  gameTitle: {
     position: 'absolute',
-    top: 30,
+    top: 0,
     left: 0,
     right: 0,
     ...Platform.select({
       ios: {
-        shadowColor: 'black',
+        shadowColor: '#66b3ff',
         shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
+        shadowOpacity: 1,
+        shadowRadius: 20,
       },
       android: {
-        elevation: 20,
+        elevation: 30,
       },
     }),
     alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
+    backgroundColor: '#c4c4c4',
+    paddingVertical: 30,
   },
-  tabBarInfoContainerBottom: {
+  bottomInfo: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     ...Platform.select({
       ios: {
-        shadowColor: 'black',
+        shadowColor: '#66b3ff',
         shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
+        shadowOpacity: 1,
+        shadowRadius: 20,
       },
       android: {
-        elevation: 20,
+        elevation: 30,
       },
     }),
     alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
+    backgroundColor: '#c4c4c4',
+    paddingVertical: 30,
   },
   tabBarInfoText: {
     fontSize: 17,
     color: 'rgba(96,100,109, 1)',
     textAlign: 'center',
   },
-  // navigationFilename: {
-  //   marginTop: 5,
-  // },
-  challengeButton: {
-    marginTop: 115,
+  challengeButtonView: {
+    marginTop: 175,
+    width: '100%',
+    height: 100,
+    backgroundColor: '#66b3ff',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   challengeButtonText: {
     fontSize: 14,
     color: '#2e78b7',
   },
-  acceptChallengeButton: {
-    marginTop: 115,
+  acceptChallengeButtonView: {
+    marginTop: 20,
+    width: '100%',
+    height: 100,
+    backgroundColor: '#66b3ff',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   acceptChallengeButtonText: {
     fontSize: 14,
