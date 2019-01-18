@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  Touchable,
-  StyleSheet,
-} from 'react-native';
+import { Text, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Camera, Permissions, Constants, FaceDetector } from 'expo';
 import { connect } from 'react-redux';
 import { socketFalse } from '../store/reducer';
@@ -31,6 +25,10 @@ class CameraScreen extends React.Component {
     if (faces.length > 0) {
       this.setState({ faces });
     }
+
+    if (faces.length === 0) {
+      this.setState({ faces: null });
+    }
   };
 
   renderFace({ bounds, faceID, rollAngle, yawAngle }) {
@@ -47,7 +45,7 @@ class CameraScreen extends React.Component {
           {
             ...bounds.size,
             left: bounds.origin.x,
-            top: bounds.origin.y - 50,
+            top: bounds.origin.y,
           },
         ]}
       >
@@ -87,6 +85,7 @@ class CameraScreen extends React.Component {
     } else {
       return (
         <View style={{ flex: 1 }}>
+          {/* Camera */}
           <Camera
             style={{ flex: 1 }}
             type={this.state.type}
@@ -97,73 +96,61 @@ class CameraScreen extends React.Component {
             }}
             onFacesDetected={this.handleFacesDetected}
           >
-            <View style={styles.topBar}>
+            {/* XY Coordinate Display */}
+            <View style={styles.xyCoords}>
               <Text style={styles.textcolor}>
                 x:{' '}
                 {this.state.faces && this.state.faces.length
                   ? this.state.faces[0].bounds.origin.x.toFixed(0)
-                  : 0}
+                  : 'null'}
               </Text>
               <Text style={styles.textcolor}>
                 y:{' '}
                 {this.state.faces && this.state.faces.length
                   ? this.state.faces[0].bounds.origin.y.toFixed(0)
-                  : 0}
+                  : `null`}
               </Text>
             </View>
 
-            <View style={styles.bottomBar}>
+            <View style={styles.faceBox}>
               <Text style={styles.textcolor}>
                 Heigth:{' '}
                 {this.state.faces && this.state.faces.length
                   ? this.state.faces[0].bounds.size.height.toFixed(0)
-                  : 0}
+                  : 'null'}
               </Text>
               <Text style={styles.textcolor}>
-                width:{' '}
+                Width:{' '}
                 {this.state.faces && this.state.faces.length
                   ? this.state.faces[0].bounds.size.width.toFixed(0)
-                  : 0}
+                  : 'null'}
               </Text>
             </View>
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: 'transparent',
-                flexDirection: 'row',
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 28,
-                  color: 'white',
-                }}
-              >
+
+            {/* Hit or Miss Text Render */}
+            <View style={styles.hitOrMissView}>
+              <Text style={styles.hitOrMissText}>
                 {`${this.state.isFaceOnCrosshairs ? 'hit' : 'miss'}`}
               </Text>
+
+              {/* Fire Button */}
               <TouchableOpacity
                 style={styles.fireButton}
                 onPress={() => this.fire()}
               >
                 <Text style={styles.fireButtonText}> FIRE </Text>
               </TouchableOpacity>
+
+              {/* End Game Button */}
               <TouchableOpacity
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignSelf: 'flex-end',
-                  alignItems: 'flex-end',
-                }}
+                style={styles.endGameButton}
                 onPress={() => this.props.socketFalse()}
               >
-                <Text
-                  style={{ fontSize: 28, marginBottom: 10, color: 'white' }}
-                >
-                  {' '}
-                  END GAME{' '}
-                </Text>
+                <Text style={styles.endGameButtonText}> END GAME </Text>
               </TouchableOpacity>
+            </View>
+            <View style={styles.crosshairs}>
+              <Image source={require('../assets/images/crosshairs.png')} />
             </View>
           </Camera>
           {this.state.faces && this.state.faces.length
@@ -180,22 +167,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  camera: {
-    flex: 1,
-    justifyContent: 'space-between',
+  // camera: {
+  //   flex: 1,
+  //   justifyContent: 'space-between',
+  // },
+  xyCoords: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    top: 30,
+    left: 30,
+    // flexDirection: 'row',
+    // justifyContent: 'space-bet',
+    // paddingTop: Constants.statusBarHeight + 1,
   },
-  topBar: {
-    flex: 0.2,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingTop: Constants.statusBarHeight + 1,
-  },
-  bottomBar: {
-    flex: 0.2,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  faceBox: {
+    position: 'absolute',
+    top: 70,
+    left: 30,
+    backgroundColor: 'white',
   },
   face: {
     padding: 10,
@@ -221,16 +210,36 @@ const styles = StyleSheet.create({
     top: 0,
   },
   textcolor: {
-    color: '#008080',
+    color: 'black',
   },
   fireButton: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignSelf: 'flex-end',
-    alignItems: 'flex-end',
+    position: 'absolute',
+    bottom: 20,
+    right: '50%',
   },
   fireButtonText: { fontSize: 28, marginBottom: 10, color: 'red' },
+  crosshairs: {
+    position: 'absolute',
+    bottom: '50%',
+    right: '50%',
+    // left: 0,
+    // top: 0,
+  },
+  endGameButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+  },
+  endGameButtonText: { fontSize: 28, marginBottom: 10, color: 'white' },
+  hitOrMissView: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+  },
+  hitOrMissText: {
+    fontSize: 28,
+    color: 'white',
+  },
 });
 
 // const mapState = state => {
