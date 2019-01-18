@@ -10,21 +10,16 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { socketTrue } from '../store/reducer';
-// import { WebBrowser } from 'expo';
-// import { MonoText } from '../components/StyledText';
 
 class ChallengeScreen extends React.Component {
-  // constructor(props) {
-  //   super(props);
-  // }
+  constructor(props) {
+    super(props);
 
-  // static navigationOptions = {
-  //   title: 'I Challenge You to a Duel',
-  // };
-
-  // challengeOpponent = () => {
-  //   this.setState({ whatever: true });
-  // };
+    this.state = {
+      IP: 'http://localhost.com:3000',
+      // IP: 'https://ichallengeyoutoaduel.herokuapp.com'
+    };
+  }
 
   render() {
     return (

@@ -19,8 +19,8 @@ class CameraScreen extends React.Component {
       opponentEmpty: false,
       centerX: null,
       centerY: null,
-      faceX: 'string',
-      faceY: 'string',
+      faceX: null,
+      faceY: null,
     };
   }
 
