@@ -109,10 +109,10 @@ class CameraScreen extends React.Component {
         parseInt(this.state.faces[0].bounds.size.height.toFixed(0) + 400) >=
         this.state.centerY
     ) {
-      console.log('hit');
+      // console.log('hit');
       this.setState({ hit: true });
     } else {
-      console.log('miss');
+      // console.log('miss');
       this.setState({ hit: false });
     }
 
@@ -291,11 +291,11 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   face: {
-    padding: 1,
+    padding: -10,
     borderWidth: 1,
-    borderRadius: 2,
+    borderRadius: 100,
     position: 'absolute',
-    borderColor: 'yellow',
+    borderColor: 'red',
     justifyContent: 'center',
     backgroundColor: 'transparent',
   },
