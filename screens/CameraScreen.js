@@ -4,6 +4,9 @@ import { Camera, Permissions, Constants, FaceDetector } from 'expo';
 import { connect } from 'react-redux';
 import { socketFalse } from '../store/reducer';
 import ShotIcons from '../components/ShotIcons';
+import XYCoords from '../components/XYCoords';
+import HitOrMiss from '../components/HitOrMiss';
+import Win from './Win';
 
 class CameraScreen extends React.Component {
   constructor(props) {
@@ -14,19 +17,21 @@ class CameraScreen extends React.Component {
       type: Camera.Constants.Type.back,
       faces: null,
       hit: null,
+      hitCount: 0,
       isWinner: false,
-      shotsRemaining: this.props.shotsRemaining,
+      shotsRemaining: null,
       opponentEmpty: false,
       centerX: null,
       centerY: null,
-      faceX: 'string',
-      faceY: 'string',
+      faceX: null,
+      faceY: null,
     };
   }
 
   async componentDidMount() {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === 'granted' });
+    this.setState({ shotsRemaining: this.props.shotsRemaining });
     console.log('build complete');
   }
 
@@ -89,9 +94,7 @@ class CameraScreen extends React.Component {
   }
 
   renderFaces = () => (
-    // <View style={styles.facesContainer} pointerEvents="none">
     //   {this.state.faces ? this.state.faces.map(this.renderFace) : ''}
-    // </View>
     <View style={styles.facesContainer} pointerEvents="none">
       {this.state.faces ? this.renderFace(this.state.faces[0]) : ''}
     </View>
@@ -99,6 +102,7 @@ class CameraScreen extends React.Component {
 
   fire() {
     if (
+      this.state.shotsRemaining > 0 &&
       this.state.faces &&
       this.state.faceX < this.state.centerX &&
       this.state.faceY < this.state.centerY &&
@@ -110,13 +114,19 @@ class CameraScreen extends React.Component {
         this.state.centerY
     ) {
       // console.log('hit');
-      this.setState({ hit: true });
+
+      this.setState({ hit: true, hitCount: this.state.hitCount + 1 });
     } else {
       // console.log('miss');
       this.setState({ hit: false });
     }
+    if (this.state.shotsRemaining > 0) {
+      this.setState({ shotsRemaining: this.state.shotsRemaining - 1 });
+    }
+  }
 
-    this.setState({ shotsRemaining: this.state.shotsRemaining - 1 });
+  reload() {
+    this.setState({ shotsRemaining: this.props.shotsRemaining });
   }
 
   render() {
@@ -130,6 +140,8 @@ class CameraScreen extends React.Component {
           to I Challenge You to a Duel
         </Text>
       );
+    } else if (this.state.hitCount === this.props.hitsToWin) {
+      return <Win />;
     } else {
       return (
         <View
@@ -154,80 +166,27 @@ class CameraScreen extends React.Component {
             ? this.renderFaces()
             : undefined}
 
-          {/* XY Coordinate Display */}
-          <View style={styles.xyCoords}>
-            <Text style={styles.textcolor}>
-              CenterX:{' '}
-              {this.state.faces && this.state.faces.length
-                ? this.state.centerX
-                : 'null'}
-            </Text>
-            <Text style={styles.textcolor}>
-              TopLeftFaceX:{' '}
-              {this.state.faces && this.state.faces.length && this.state.faceX
-                ? this.state.faceX
-                : 'null'}
-            </Text>
-            <Text style={styles.textcolor}>
-              Width:{' '}
-              {this.state.faces && this.state.faces.length
-                ? this.state.faces[0].bounds.size.width.toFixed(0)
-                : 'null'}
-            </Text>
-            {/* <Text style={styles.textcolor}>
-              TopRightX:{' '}
-              {this.state.faces && this.state.faces.length && this.state.faceX
-                ? parseInt(this.state.faceX) +
-                  parseInt(this.state.faces[0].bounds.size.width.toFixed(0))
-                : 'null'}
-            </Text> */}
-            <Text style={styles.textcolor}>
-              CenterY:{' '}
-              {this.state.faces && this.state.faces.length
-                ? this.state.centerY
-                : 'null'}
-            </Text>
-            <Text style={styles.textcolor}>
-              TopLeftFaceY:{' '}
-              {this.state.faces && this.state.faces.length && this.state.faceX
-                ? this.state.faceY
-                : 'null'}
-            </Text>
-            {/* <Text style={styles.textcolor}>
-              BottomLeftY:{' '}
-              {this.state.faces && this.state.faces.length && this.state.faceX
-                ? parseInt(this.state.faceY) +
-                  parseInt(this.state.faces[0].bounds.size.height.toFixed(0))
-                : 'null'}
-            </Text> */}
-            <Text style={styles.textcolor}>
-              Height:{' '}
-              {this.state.faces && this.state.faces.length
-                ? this.state.faces[0].bounds.size.height.toFixed(0)
-                : 'null'}
-            </Text>
-          </View>
+          {/* XY DebuggingConsole */}
+          {/* <XYCoords state={this.state} styles={styles} /> */}
 
           {/* Hit or Miss Text Render */}
-          <View style={styles.hitOrMissView}>
-            <Text style={styles.hitOrMissText}>
-              {`${this.state.hit ? 'hit' : 'miss'}`}
-            </Text>
-          </View>
+          <HitOrMiss state={this.state} styles={styles} />
 
           {/* Crosshairs */}
-          <View style={styles.crosshairsView}>
+          <TouchableOpacity
+            onPress={() => this.fire()}
+            style={styles.crosshairsView}
+          >
             <Image
               style={styles.crosshairsImage}
               source={require('../assets/images/crosshairs.png')}
             />
             <View onLayout={this.setCenter} style={styles.centerPixel} />
-          </View>
-
+          </TouchableOpacity>
           {/* End Game Button */}
           <TouchableOpacity
             style={styles.endGameButtonView}
-            onPress={() => this.props.socketFalse()}
+            onPress={this.props.socketFalse}
           >
             <Text style={styles.endGameButtonText}> Home </Text>
           </TouchableOpacity>
@@ -248,6 +207,18 @@ class CameraScreen extends React.Component {
             shotsRemaining={this.state.shotsRemaining}
             styles={styles}
           />
+
+          {/* Fire Hydrant Icon */}
+          <TouchableOpacity
+            style={styles.hydrantView}
+            onPress={() => this.reload()}
+          >
+            <Image
+              onPress={this.reload}
+              style={styles.hydrantImage}
+              source={require('../assets/images/firehydrant.png')}
+            />
+          </TouchableOpacity>
         </View>
       );
     }
@@ -310,10 +281,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
-    // bottom: 0,
-    // right: 0,
-    // left: 0,
-    // top: 0,
   },
   textcolor: {
     color: 'black',
@@ -325,7 +292,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'transparent',
   },
-  fireButtonText: { fontSize: 28, color: 'red' },
+  // fireButtonText: { fontSize: 28, color: 'red' },
   fireButtonImage: {
     width: 225,
     height: 145,
@@ -348,19 +315,10 @@ const styles = StyleSheet.create({
   centerPixel: {
     position: 'absolute',
     backgroundColor: 'red',
-    width: 1,
-    height: 1,
-    borderRadius: 1,
+    width: 3,
+    height: 3,
+    borderRadius: 2,
   },
-  // testPixel: {
-  //   position: 'absolute',
-  //   top: 284,
-  //   left: 160,
-  //   backgroundColor: 'yellow',
-  //   width: 4,
-  //   height: 4,
-  //   borderRadius: 1,
-  // },
   endGameButtonView: {
     position: 'absolute',
     alignItems: 'center',
@@ -369,11 +327,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   endGameButtonText: { fontSize: 28, color: 'white' },
-  dropletView: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-  },
+  // dropletView: {
+  //   position: 'absolute',
+  //   width: '100%',
+  //   height: '100%',
+  // },
   dropletImage1: {
     position: 'absolute',
     bottom: 5,
@@ -444,11 +402,24 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
+  // hydrantView: {
+  //   position: 'absolute',
+  //   width: '100%',
+  //   height: '100%',
+  // },
+  hydrantImage: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+    width: 21,
+    height: 50,
+  },
 });
 
 const mapState = state => {
   return {
     shotsRemaining: state.shotsRemaining,
+    hitsToWin: state.hitsToWin,
   };
 };
 

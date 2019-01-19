@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { WebBrowser } from 'expo';
-import { MonoText } from '../components/StyledText';
+// import { WebBrowser } from 'expo';
+// import { MonoText } from '../components/StyledText';
 import ChallengeScreen from './ChallengeScreen';
-import CameraScreen from './CameraScreen';
+import GetReady from './GetReady';
 import { connect } from 'react-redux';
 
 class HomeScreen extends React.Component {
@@ -19,7 +19,7 @@ class HomeScreen extends React.Component {
     if (!this.props.socketConnection) {
       return <ChallengeScreen />;
     } else {
-      return <CameraScreen />;
+      return <GetReady />;
     }
   }
 

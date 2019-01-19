@@ -9,63 +9,51 @@ import {
   View,
 } from 'react-native';
 import { connect } from 'react-redux';
-import { socketTrue } from '../store/reducer';
-// import { WebBrowser } from 'expo';
-// import { MonoText } from '../components/StyledText';
+import { socketFalse } from '../store/reducer';
 
-class ChallengeScreen extends React.Component {
-  // constructor(props) {
-  //   super(props);
-  // }
+class Win extends React.Component {
+  constructor(props) {
+    super(props);
 
-  // static navigationOptions = {
-  //   title: 'I Challenge You to a Duel',
-  // };
+    this.state = {
+      countdown: 5,
+      restartGame: false,
+    };
+  }
 
-  // challengeOpponent = () => {
-  //   this.setState({ whatever: true });
-  // };
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState({ countdown: 4 });
+    }, 1000);
+
+    setTimeout(() => {
+      this.setState({ countdown: 3 });
+    }, 2000);
+    setTimeout(() => {
+      this.setState({ countdown: 2 });
+    }, 3000);
+
+    setTimeout(() => {
+      this.setState({ countdown: 1 });
+    }, 4000);
+
+    setTimeout(() => {
+      this.props.socketFalse();
+    }, 5000);
+  }
 
   render() {
-    return (
-      <View style={styles.container}>
-        <View
-          style={styles.container}
-          contentContainerStyle={styles.contentContainer}
-        >
-          {/* Game Title */}
-          <View style={styles.gameTitle}>
-            <Text style={styles.tabBarInfoText}>
-              I Challange You to a Duel! v1.0.0
-            </Text>
-          </View>
-
-          {/* Challeng Opponent Button */}
-          <TouchableOpacity
-            onPress={this.props.socketTrue}
-            style={styles.challengeButtonView}
-          >
-            <Text style={styles.challengeButtonText}>START GAME</Text>
-          </TouchableOpacity>
-
-          {/* Accept Challenge Button */}
-          {/* <TouchableOpacity
-            onPress={this.props.socketTrue}
-            style={styles.acceptChallengeButtonView}
-          >
-            <Text style={styles.acceptChallengeButtonText}>
-              Accept Challenge
-            </Text>
-          </TouchableOpacity>*/}
+    if (this.state.startGame) {
+      return <CameraScreen />;
+    } else {
+      return (
+        <View>
+          <Text>Game Over</Text>
+          <Text>You Win!</Text>
+          <Text>Restarting in... {this.state.countdown}</Text>
         </View>
-
-        <View style={styles.bottomInfo}>
-          <Text style={styles.tabBarInfoText}>
-            Challenge an Opponent to a duel!
-          </Text>
-        </View>
-      </View>
-    );
+      );
+    }
   }
 }
 
@@ -148,16 +136,16 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapState = state => {
-  return {
-    socketConnection: state.socketConnection,
-  };
-};
+// const mapState = state => {
+//   return {
+//     socketConnection: state.socketConnection,
+//   };
+// };
 
 const mapDispatch = dispatch => {
   return {
-    socketTrue: () => {
-      dispatch(socketTrue());
+    socketFalse: () => {
+      dispatch(socketFalse());
     },
     joinGame: () => {
       dispatch(joinGame());
@@ -166,6 +154,6 @@ const mapDispatch = dispatch => {
 };
 
 export default connect(
-  mapState,
+  null,
   mapDispatch
-)(ChallengeScreen);
+)(Win);
