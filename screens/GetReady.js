@@ -59,14 +59,14 @@ class GetReady extends React.Component {
 
       setTimeout(() => {
         this.setState({ startGame: true });
+        clearInterval(interval);
       }, 8000);
     }, 1000);
   }
 
   componentDidUpdate() {
-    if (this.state.countdown < 1) {
-      clearInterval(interval);
-    }
+    // if (this.state.countdown < 1) {
+    // }
   }
 
   render() {

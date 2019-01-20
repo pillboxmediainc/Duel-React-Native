@@ -40,19 +40,23 @@ class CameraScreen extends React.Component {
   }
 
   async componentDidMount() {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA);
-    this.setState({ hasCameraPermission: status === 'granted' });
-    this.setState({ shotsRemaining: this.props.shotsRemaining });
+    try {
+      const { status } = await Permissions.askAsync(Permissions.CAMERA);
+      this.setState({ hasCameraPermission: status === 'granted' });
+      this.setState({ shotsRemaining: this.props.shotsRemaining });
 
-    await this.shootSound.loadAsync(require('../assets/sounds/shoot.mp3'));
-    await this.shootEmptySound.loadAsync(
-      require('../assets/sounds/shoot-empty.mp3')
-    );
-    await this.reloadSound.loadAsync(require('../assets/sounds/reload.mp3'));
-    await this.reloadVoiceSound.loadAsync(
-      require('../assets/sounds/reload-voice.mp3')
-    );
-    await this.hitSound.loadAsync(require('../assets/sounds/hit.mp3'));
+      await this.shootSound.loadAsync(require('../assets/sounds/shoot.mp3'));
+      await this.shootEmptySound.loadAsync(
+        require('../assets/sounds/shoot-empty.mp3')
+      );
+      await this.reloadSound.loadAsync(require('../assets/sounds/reload.mp3'));
+      await this.reloadVoiceSound.loadAsync(
+        require('../assets/sounds/reload-voice.mp3')
+      );
+      await this.hitSound.loadAsync(require('../assets/sounds/hit.mp3'));
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   componentDidUpdate() {
@@ -137,11 +141,11 @@ class CameraScreen extends React.Component {
 
       this.hitSound.setPositionAsync(0);
       this.hitSound.playAsync();
-      this.hitSound.setPositionAsync(0);
+      // this.hitSound.setPositionAsync(0);
       this.setState({ hit: true, hitCount: this.state.hitCount + 1 });
       setTimeout(() => {
         this.setState({ hit: null });
-      }, 600);
+      }, 1000);
     } else {
       // console.log('miss');
       this.setState({ hit: false });
@@ -149,7 +153,7 @@ class CameraScreen extends React.Component {
     if (this.state.shotsRemaining > 0) {
       this.shootSound.setPositionAsync(0);
       this.shootSound.playAsync();
-      this.shootSound.setPositionAsync(0);
+      // this.shootSound.setPositionAsync(0);
       this.setState({ splat: (this.state.splat + 1) % 4 });
       this.setState({ showSplat: true });
 
@@ -162,11 +166,11 @@ class CameraScreen extends React.Component {
     if (this.state.shotsRemaining < 1) {
       this.shootEmptySound.setPositionAsync(0);
       this.shootEmptySound.playAsync();
-      this.shootEmptySound.setPositionAsync(0);
+      // this.shootEmptySound.setPositionAsync(0);
 
       this.reloadVoiceSound.setPositionAsync(0);
       this.reloadVoiceSound.playAsync();
-      this.reloadVoiceSound.setPositionAsync(0);
+      // this.reloadVoiceSound.setPositionAsync(0);
       this.setState({ reload: true });
       setTimeout(() => {
         this.setState({ reload: false });
@@ -174,15 +178,21 @@ class CameraScreen extends React.Component {
     }
   }
 
-  reload() {
+  async reload() {
     this.setState({ shotsRemaining: this.props.shotsRemaining });
-    this.reloadSound.setPositionAsync(0);
-    this.reloadSound.playAsync();
-    this.reloadSound.setPositionAsync(0);
+
+    try {
+      this.reloadSound.setPositionAsync(0);
+      await this.reloadSound.playAsync();
+      // this.reloadSound.setPositionAsync(0);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   render() {
     const { hasCameraPermission } = this.state;
+
     if (hasCameraPermission === null) {
       return <View />;
     } else if (hasCameraPermission === false) {
@@ -229,7 +239,7 @@ class CameraScreen extends React.Component {
             <View style={styles.hitReloadView}>
               <Image
                 style={styles.hitReloadImage}
-                source={require('../assets/images/HIT.gif')}
+                source={require('../assets/images/HIT.png')}
               />
             </View>
           ) : null}
@@ -239,7 +249,7 @@ class CameraScreen extends React.Component {
             <View style={styles.hitReloadView}>
               <Image
                 style={styles.hitReloadImage}
-                source={require('../assets/images/RELOAD.gif')}
+                source={require('../assets/images/RELOAD.png')}
               />
             </View>
           ) : null}

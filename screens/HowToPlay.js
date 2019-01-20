@@ -26,7 +26,7 @@ export default class HowToPlay extends React.Component {
         <View style={styles.backgroundImage}>
           <Image
             style={styles.backgroundImage}
-            source={require('../assets/images/pool-still.png')}
+            source={require('../assets/images/pool-animation.gif')}
           />
         </View>
 
@@ -35,6 +35,14 @@ export default class HowToPlay extends React.Component {
           <Image
             style={styles.header}
             source={require('../assets/images/header-how-to-play.png')}
+          />
+        </View>
+
+        {/* How to Play Image */}
+        <View style={styles.rulesView}>
+          <Image
+            style={styles.rulesImage}
+            source={require('../assets/images/how-to-play.png')}
           />
         </View>
 
@@ -77,5 +85,17 @@ const styles = StyleSheet.create({
     top: 10,
     width: 250,
     height: 250,
+  },
+  rulesView: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+  },
+  rulesImage: {
+    position: 'absolute',
+    top: 150,
+    width: 320,
+    height: 330,
   },
 });

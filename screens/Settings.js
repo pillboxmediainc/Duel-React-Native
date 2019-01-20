@@ -27,7 +27,7 @@ class Settings extends React.Component {
         <View style={styles.backgroundImage}>
           <Image
             style={styles.backgroundImage}
-            source={require('../assets/images/pool-still.png')}
+            source={require('../assets/images/pool-animation.gif')}
           />
         </View>
 

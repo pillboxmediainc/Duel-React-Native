@@ -10,7 +10,7 @@ export default class HitReload extends React.Component {
           <View style={this.props.styles.hitReloadView}>
             <Image
               style={this.props.styles.hitReloadImage}
-              source={require('../assets/images/HIT.gif')}
+              source={require('../assets/images/HIT.png')}
             />
           </View>
         ) : null}
