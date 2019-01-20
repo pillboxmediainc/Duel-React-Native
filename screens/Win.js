@@ -23,11 +23,15 @@ class Win extends React.Component {
     };
 
     this.gameOverSound = new Expo.Audio.Sound();
+    this.gameOverVoiceSound = new Expo.Audio.Sound();
   }
 
   async componentDidMount() {
     await this.gameOverSound.loadAsync(
-      require('../assets/sounds/gameover.mp3')
+      require('../assets/sounds/game-over.mp3')
+    );
+    await this.gameOverVoiceSound.loadAsync(
+      require('../assets/sounds/game-over-voice.mp3')
     );
 
     setTimeout(() => {
@@ -41,7 +45,10 @@ class Win extends React.Component {
 
   render() {
     if (this.state.countdown === 0) {
-      this.gameOverSound.playAsync();
+      this.gameOverVoiceSound.playAsync();
+      setTimeout(() => {
+        this.gameOverSound.playAsync();
+      }, 1000);
     }
 
     if (this.state.restartGame) {

@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Camera, Permissions, Constants, FaceDetector } from 'expo';
 import { connect } from 'react-redux';
+import { Audio } from 'expo';
 import { socketFalse } from '../store/reducer';
 import ShotIcons from '../components/ShotIcons';
 import XYCoords from '../components/XYCoords';
@@ -27,14 +28,31 @@ class CameraScreen extends React.Component {
       faceX: null,
       faceY: null,
       reload: false,
+      splat: 0,
+      showSplat: false,
     };
+
+    this.shootSound = new Expo.Audio.Sound();
+    this.shootEmptySound = new Expo.Audio.Sound();
+    this.reloadSound = new Expo.Audio.Sound();
+    this.reloadVoiceSound = new Expo.Audio.Sound();
+    this.hitSound = new Expo.Audio.Sound();
   }
 
   async componentDidMount() {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === 'granted' });
     this.setState({ shotsRemaining: this.props.shotsRemaining });
-    console.log('build complete');
+
+    await this.shootSound.loadAsync(require('../assets/sounds/shoot.mp3'));
+    await this.shootEmptySound.loadAsync(
+      require('../assets/sounds/shoot-empty.mp3')
+    );
+    await this.reloadSound.loadAsync(require('../assets/sounds/reload.mp3'));
+    await this.reloadVoiceSound.loadAsync(
+      require('../assets/sounds/reload-voice.mp3')
+    );
+    await this.hitSound.loadAsync(require('../assets/sounds/hit.mp3'));
   }
 
   componentDidUpdate() {
@@ -116,6 +134,10 @@ class CameraScreen extends React.Component {
         this.state.centerY
     ) {
       // console.log('hit');
+
+      this.hitSound.setPositionAsync(0);
+      this.hitSound.playAsync();
+      this.hitSound.setPositionAsync(0);
       this.setState({ hit: true, hitCount: this.state.hitCount + 1 });
       setTimeout(() => {
         this.setState({ hit: null });
@@ -125,10 +147,26 @@ class CameraScreen extends React.Component {
       this.setState({ hit: false });
     }
     if (this.state.shotsRemaining > 0) {
+      this.shootSound.setPositionAsync(0);
+      this.shootSound.playAsync();
+      this.shootSound.setPositionAsync(0);
+      this.setState({ splat: (this.state.splat + 1) % 4 });
+      this.setState({ showSplat: true });
+
+      setTimeout(() => {
+        this.setState({ showSplat: false });
+      }, 500);
       this.setState({ shotsRemaining: this.state.shotsRemaining - 1 });
     }
 
     if (this.state.shotsRemaining < 1) {
+      this.shootEmptySound.setPositionAsync(0);
+      this.shootEmptySound.playAsync();
+      this.shootEmptySound.setPositionAsync(0);
+
+      this.reloadVoiceSound.setPositionAsync(0);
+      this.reloadVoiceSound.playAsync();
+      this.reloadVoiceSound.setPositionAsync(0);
       this.setState({ reload: true });
       setTimeout(() => {
         this.setState({ reload: false });
@@ -138,6 +176,9 @@ class CameraScreen extends React.Component {
 
   reload() {
     this.setState({ shotsRemaining: this.props.shotsRemaining });
+    this.reloadSound.setPositionAsync(0);
+    this.reloadSound.playAsync();
+    this.reloadSound.setPositionAsync(0);
   }
 
   render() {
@@ -213,6 +254,39 @@ class CameraScreen extends React.Component {
               source={require('../assets/images/crosshairs.png')}
             />
             <View onLayout={this.setCenter} style={styles.centerPixel} />
+            {/* Splat */}
+            {this.state.showSplat && this.state.splat === 0 ? (
+              <View>
+                <Image
+                  style={styles.splateImage1}
+                  source={require('../assets/images/splat1.png')}
+                />
+              </View>
+            ) : null}
+            {this.state.showSplat && this.state.splat === 1 ? (
+              <View>
+                <Image
+                  style={styles.splateImage2}
+                  source={require('../assets/images/splat2.png')}
+                />
+              </View>
+            ) : null}
+            {this.state.showSplat && this.state.splat === 2 ? (
+              <View>
+                <Image
+                  style={styles.splateImage3}
+                  source={require('../assets/images/splat3.png')}
+                />
+              </View>
+            ) : null}
+            {this.state.showSplat && this.state.splat === 3 ? (
+              <View>
+                <Image
+                  style={styles.splateImage4}
+                  source={require('../assets/images/splat4.png')}
+                />
+              </View>
+            ) : null}
           </TouchableOpacity>
           {/* End Game Button */}
           <TouchableOpacity
@@ -254,7 +328,7 @@ class CameraScreen extends React.Component {
             <Image
               onPress={this.reload}
               style={styles.hydrantImage}
-              source={require('../assets/images/firehydrant.png')}
+              source={require('../assets/images/hydrant.png')}
             />
           </TouchableOpacity>
         </View>
@@ -347,9 +421,9 @@ const styles = StyleSheet.create({
   centerPixel: {
     position: 'absolute',
     backgroundColor: 'red',
-    width: 3,
-    height: 3,
-    borderRadius: 2,
+    width: 1,
+    height: 1,
+    borderRadius: 1,
   },
   endGameButtonView: {
     position: 'absolute',
@@ -451,8 +525,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 5,
     right: 5,
-    width: 21,
-    height: 50,
+    width: 42,
+    height: 100,
   },
   hitReloadView: {
     position: 'absolute',
@@ -463,6 +537,34 @@ const styles = StyleSheet.create({
   hitReloadImage: {
     position: 'absolute',
     top: 40,
+  },
+  splatView: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'transparent',
+  },
+  splateImage1: {
+    width: 65,
+    height: 65,
+    backgroundColor: 'transparent',
+  },
+  splateImage2: {
+    width: 50,
+    height: 50,
+    backgroundColor: 'transparent',
+  },
+  splateImage3: {
+    width: 50,
+    height: 50,
+    backgroundColor: 'transparent',
+  },
+  splateImage4: {
+    width: 65,
+    height: 65,
+    backgroundColor: 'transparent',
   },
 });
 

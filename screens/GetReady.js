@@ -19,37 +19,33 @@ class GetReady extends React.Component {
     super(props);
 
     this.state = {
-      countdown: 6,
+      countdown: 7,
       startGame: false,
     };
 
-    this.countdownSound5 = new Expo.Audio.Sound();
-    this.countdownSound4 = new Expo.Audio.Sound();
-    this.countdownSound3 = new Expo.Audio.Sound();
-    this.countdownSound2 = new Expo.Audio.Sound();
-    this.countdownSound1 = new Expo.Audio.Sound();
+    // this.countdownSound5 = new Expo.Audio.Sound();
+    // this.countdownSound4 = new Expo.Audio.Sound();
+    // this.countdownSound3 = new Expo.Audio.Sound();
+    // this.countdownSound2 = new Expo.Audio.Sound();
+    this.countdownSound = new Expo.Audio.Sound();
     this.battleSound = new Expo.Audio.Sound();
+    this.getReadySound = new Expo.Audio.Sound();
+    this.splashRoyaleSound = new Expo.Audio.Sound();
   }
 
   async componentDidMount() {
     // Load Sounds
     try {
-      await this.countdownSound5.loadAsync(
-        require('../assets/sounds/countdown.mp3')
-      );
-      await this.countdownSound4.loadAsync(
-        require('../assets/sounds/countdown.mp3')
-      );
-      await this.countdownSound3.loadAsync(
-        require('../assets/sounds/countdown.mp3')
-      );
-      await this.countdownSound2.loadAsync(
-        require('../assets/sounds/countdown.mp3')
-      );
-      await this.countdownSound1.loadAsync(
+      await this.countdownSound.loadAsync(
         require('../assets/sounds/countdown.mp3')
       );
       await this.battleSound.loadAsync(require('../assets/sounds/battle.mp3'));
+      await this.getReadySound.loadAsync(
+        require('../assets/sounds/get-ready.mp3')
+      );
+      await this.splashRoyaleSound.loadAsync(
+        require('../assets/sounds/splash-royale.mp3')
+      );
     } catch (error) {
       // An error occurred!
     }
@@ -59,37 +55,34 @@ class GetReady extends React.Component {
       this.setState({ countdown: this.state.countdown - 1 });
       interval = setInterval(() => {
         this.setState({ countdown: this.state.countdown - 1 });
-      }, 1);
+      }, 1000);
 
       setTimeout(() => {
         this.setState({ startGame: true });
-      }, 6);
+      }, 8000);
     }, 1000);
   }
 
-  componentWillUnmount() {
-    clearInterval(interval);
+  componentDidUpdate() {
+    if (this.state.countdown < 1) {
+      clearInterval(interval);
+    }
   }
 
   render() {
-    // if (this.state.countdown === 5) {
-    //   this.countdownSound5.playAsync();
-    // }
-    // if (this.state.countdown === 4) {
-    //   this.countdownSound4.playAsync();
-    // }
-    // if (this.state.countdown === 3) {
-    //   this.countdownSound3.playAsync();
-    // }
-    // if (this.state.countdown === 2) {
-    //   this.countdownSound2.playAsync();
-    // }
-    // if (this.state.countdown === 1) {
-    //   this.countdownSound1.playAsync();
-    // }
-    // if (this.state.countdown === 0) {
-    //   this.battleSound.playAsync();
-    // }
+    if (this.state.countdown === 6) {
+      this.getReadySound.playAsync();
+    }
+
+    if (this.state.countdown > 0 && this.state.countdown < 6) {
+      this.countdownSound.setPositionAsync(0);
+      this.countdownSound.playAsync();
+      this.countdownSound.setPositionAsync(0);
+    }
+    if (this.state.countdown < 1) {
+      this.splashRoyaleSound.playAsync();
+      this.battleSound.playAsync();
+    }
 
     if (this.state.startGame) {
       return <CameraScreen />;
