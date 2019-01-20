@@ -10,47 +10,53 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { socketFalse } from '../store/reducer';
+import ChallengeScreen from './ChallengeScreen';
 
 class Win extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      countdown: 5,
       restartGame: false,
     };
   }
 
-  componentDidMount() {
-    setTimeout(() => {
-      this.setState({ countdown: 4 });
-    }, 1000);
-
-    setTimeout(() => {
-      this.setState({ countdown: 3 });
-    }, 2000);
-    setTimeout(() => {
-      this.setState({ countdown: 2 });
-    }, 3000);
-
-    setTimeout(() => {
-      this.setState({ countdown: 1 });
-    }, 4000);
-
-    setTimeout(() => {
-      this.props.socketFalse();
-    }, 5000);
-  }
+  renderChallengeScreen = () => {
+    this.setState({ restartGame: true });
+  };
 
   render() {
-    if (this.state.startGame) {
-      return <CameraScreen />;
+    if (this.state.restartGame) {
+      return <ChallengeScreen />;
     } else {
       return (
-        <View>
-          <Text>Game Over</Text>
-          <Text>You Win!</Text>
-          <Text>Restarting in... {this.state.countdown}</Text>
+        <View style={styles.mainView}>
+          {/* Background Image */}
+          <View style={styles.backgroundImage}>
+            <Image
+              style={styles.backgroundImage}
+              source={require('../assets/images/pool-animation.gif')}
+            />
+          </View>
+
+          {/* Game Over Header */}
+          <View style={styles.header}>
+            <Image
+              style={styles.header}
+              source={require('../assets/images/header-game-over.png')}
+            />
+          </View>
+
+          {/* Rematch Button */}
+          <TouchableOpacity
+            onPress={this.props.socketFalse}
+            style={styles.button}
+          >
+            <Image
+              source={require('../assets/images/button-rematch.png')}
+              style={styles.button}
+            />
+          </TouchableOpacity>
         </View>
       );
     }
@@ -58,81 +64,29 @@ class Win extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  contentContainer: {
-    paddingTop: 30,
-  },
-  gameTitle: {
+  mainView: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#66b3ff',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 1,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 30,
-      },
-    }),
+    height: '100%',
+    width: '100%',
+    backgroundColor: '#fcfcfc',
     alignItems: 'center',
-    backgroundColor: '#c4c4c4',
-    paddingVertical: 30,
   },
-  bottomInfo: {
+  button: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#66b3ff',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 1,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 30,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#c4c4c4',
-    paddingVertical: 30,
+    bottom: 10,
+    width: 200,
+    height: 62,
   },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  challengeButtonView: {
-    marginTop: 175,
+  backgroundImage: {
+    position: 'absolute',
     width: '100%',
-    height: 100,
-    backgroundColor: '#66b3ff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: '100%',
   },
-  challengeButtonText: {
-    fontSize: 14,
-    color: '#2e78b7',
-  },
-  acceptChallengeButtonView: {
-    marginTop: 20,
-    width: '100%',
-    height: 100,
-    backgroundColor: '#66b3ff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  acceptChallengeButtonText: {
-    fontSize: 14,
-    color: '#2e78b7',
+  header: {
+    position: 'absolute',
+    top: 10,
+    width: 250,
+    height: 250,
   },
 });
 

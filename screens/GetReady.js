@@ -22,24 +22,9 @@ class GetReady extends React.Component {
   }
 
   componentDidMount() {
-    setTimeout(() => {
-      this.setState({ countdown: 4 });
+    setInterval(() => {
+      this.setState({ countdown: this.state.countdown - 1 });
     }, 1000);
-
-    setTimeout(() => {
-      this.setState({ countdown: 3 });
-    }, 2000);
-    setTimeout(() => {
-      this.setState({ countdown: 2 });
-    }, 3000);
-
-    setTimeout(() => {
-      this.setState({ countdown: 1 });
-    }, 4000);
-
-    setTimeout(() => {
-      this.setState({ countdown: 'DRAW!' });
-    }, 5000);
 
     setTimeout(() => {
       this.setState({ startGame: true });
@@ -51,9 +36,77 @@ class GetReady extends React.Component {
       return <CameraScreen />;
     } else {
       return (
-        <View>
-          <Text>Get Ready</Text>
-          <Text>{this.state.countdown}</Text>
+        <View style={styles.mainView}>
+          {/* Background Image */}
+          <View style={styles.backgroundImage}>
+            <Image
+              style={styles.backgroundImage}
+              source={require('../assets/images/pool-animation.gif')}
+            />
+          </View>
+
+          {/* Get Ready Header */}
+
+          {this.state.countdown !== 0 ? (
+            <View style={styles.headerView}>
+              <Image
+                style={styles.headerImage}
+                source={require('../assets/images/header-get-ready.png')}
+              />
+            </View>
+          ) : null}
+
+          {/* Countdown */}
+          {this.state.countdown === 5 ? (
+            <View style={styles.countdownView}>
+              <Image
+                style={styles.countdownImage}
+                source={require('../assets/images/5.png')}
+              />
+            </View>
+          ) : null}
+
+          {this.state.countdown === 4 ? (
+            <View style={styles.countdownView}>
+              <Image
+                style={styles.countdownImage}
+                source={require('../assets/images/4.png')}
+              />
+            </View>
+          ) : null}
+
+          {this.state.countdown === 3 ? (
+            <View style={styles.countdownView}>
+              <Image
+                style={styles.countdownImage}
+                source={require('../assets/images/3.png')}
+              />
+            </View>
+          ) : null}
+          {this.state.countdown === 2 ? (
+            <View style={styles.countdownView}>
+              <Image
+                style={styles.countdownImage}
+                source={require('../assets/images/2.png')}
+              />
+            </View>
+          ) : null}
+          {this.state.countdown === 1 ? (
+            <View style={styles.countdownView}>
+              <Image
+                style={styles.countdownImage}
+                source={require('../assets/images/1.png')}
+              />
+            </View>
+          ) : null}
+          {this.state.countdown === 0 ? (
+            <View style={styles.splashView}>
+              <Image
+                style={styles.splashImage}
+                source={require('../assets/images/splash-battle.png')}
+              />
+            </View>
+          ) : null}
         </View>
       );
     }
@@ -61,81 +114,55 @@ class GetReady extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  contentContainer: {
-    paddingTop: 30,
-  },
-  gameTitle: {
+  mainView: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#66b3ff',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 1,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 30,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#c4c4c4',
-    paddingVertical: 30,
-  },
-  bottomInfo: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#66b3ff',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 1,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 30,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#c4c4c4',
-    paddingVertical: 30,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  challengeButtonView: {
-    marginTop: 175,
+    height: '100%',
     width: '100%',
-    height: 100,
-    backgroundColor: '#66b3ff',
+    alignItems: 'center',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  headerView: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  challengeButtonText: {
-    fontSize: 14,
-    color: '#2e78b7',
+  headerImage: {
+    position: 'absolute',
+    top: 50,
+    width: 300,
+    height: 300,
   },
-  acceptChallengeButtonView: {
-    marginTop: 20,
+  countdownView: {
+    position: 'absolute',
     width: '100%',
-    height: 100,
-    backgroundColor: '#66b3ff',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  acceptChallengeButtonText: {
-    fontSize: 14,
-    color: '#2e78b7',
+  countdownImage: {
+    position: 'absolute',
+    top: 200,
+    width: 300,
+    height: 300,
+  },
+  splashView: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  splashImage: {
+    // position: 'absolute',
+    // top: 200,
+    width: 360,
+    height: 180,
   },
 });
 

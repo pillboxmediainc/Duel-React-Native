@@ -6,6 +6,7 @@ import { socketFalse } from '../store/reducer';
 import ShotIcons from '../components/ShotIcons';
 import XYCoords from '../components/XYCoords';
 import HitOrMiss from '../components/HitOrMiss';
+import HitReload from '../components/HitReload';
 import Win from './Win';
 
 class CameraScreen extends React.Component {
@@ -25,6 +26,7 @@ class CameraScreen extends React.Component {
       centerY: null,
       faceX: null,
       faceY: null,
+      reload: false,
     };
   }
 
@@ -114,14 +116,23 @@ class CameraScreen extends React.Component {
         this.state.centerY
     ) {
       // console.log('hit');
-
       this.setState({ hit: true, hitCount: this.state.hitCount + 1 });
+      setTimeout(() => {
+        this.setState({ hit: null });
+      }, 600);
     } else {
       // console.log('miss');
       this.setState({ hit: false });
     }
     if (this.state.shotsRemaining > 0) {
       this.setState({ shotsRemaining: this.state.shotsRemaining - 1 });
+    }
+
+    if (this.state.shotsRemaining < 1) {
+      this.setState({ reload: true });
+      setTimeout(() => {
+        this.setState({ reload: false });
+      }, 600);
     }
   }
 
@@ -170,7 +181,27 @@ class CameraScreen extends React.Component {
           {/* <XYCoords state={this.state} styles={styles} /> */}
 
           {/* Hit or Miss Text Render */}
-          <HitOrMiss state={this.state} styles={styles} />
+          {/* <HitOrMiss state={this.state} styles={styles} /> */}
+
+          {/* Hit Animated Gif */}
+          {this.state.hit ? (
+            <View style={styles.hitReloadView}>
+              <Image
+                style={styles.hitReloadImage}
+                source={require('../assets/images/HIT.gif')}
+              />
+            </View>
+          ) : null}
+
+          {/* Reload Animated Gif */}
+          {this.state.reload ? (
+            <View style={styles.hitReloadView}>
+              <Image
+                style={styles.hitReloadImage}
+                source={require('../assets/images/RELOAD.gif')}
+              />
+            </View>
+          ) : null}
 
           {/* Crosshairs */}
           <TouchableOpacity
@@ -188,8 +219,15 @@ class CameraScreen extends React.Component {
             style={styles.endGameButtonView}
             onPress={this.props.socketFalse}
           >
-            <Text style={styles.endGameButtonText}> Home </Text>
+            <Text style={styles.endGameButtonText}>+</Text>
           </TouchableOpacity>
+
+          {/* Score */}
+          <View style={styles.scoreView} onPress={this.props.socketFalse}>
+            <Text style={styles.scoreText}>
+              Hits to Win: {this.props.hitsToWin - this.state.hitCount}
+            </Text>
+          </View>
 
           {/* Fire Button */}
           <TouchableOpacity
@@ -233,17 +271,12 @@ const styles = StyleSheet.create({
   camera: {
     height: '100%',
     width: '100%',
-    // flex: 1,
-    // justifyContent: 'space-between',
   },
   xyCoords: {
     position: 'absolute',
     backgroundColor: 'white',
     top: 30,
     left: 30,
-    // flexDirection: 'row',
-    // justifyContent: 'space-bet',
-    // paddingTop: Constants.statusBarHeight + 1,
   },
   faceBox: {
     position: 'absolute',
@@ -292,7 +325,6 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'transparent',
   },
-  // fireButtonText: { fontSize: 28, color: 'red' },
   fireButtonImage: {
     width: 225,
     height: 145,
@@ -321,17 +353,25 @@ const styles = StyleSheet.create({
   },
   endGameButtonView: {
     position: 'absolute',
-    alignItems: 'center',
-    top: 20,
-    width: '100%',
+    top: -15,
+    right: 0,
     backgroundColor: 'transparent',
   },
-  endGameButtonText: { fontSize: 28, color: 'white' },
-  // dropletView: {
-  //   position: 'absolute',
-  //   width: '100%',
-  //   height: '100%',
-  // },
+  endGameButtonText: {
+    fontSize: 50,
+    transform: [{ rotate: '45deg' }],
+    color: '#e5262b',
+  },
+  scoreView: {
+    position: 'absolute',
+    top: -2,
+    left: 3,
+    backgroundColor: 'transparent',
+  },
+  scoreText: {
+    fontSize: 28,
+    color: '#0ea8fa',
+  },
   dropletImage1: {
     position: 'absolute',
     bottom: 5,
@@ -413,6 +453,16 @@ const styles = StyleSheet.create({
     right: 5,
     width: 21,
     height: 50,
+  },
+  hitReloadView: {
+    position: 'absolute',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  hitReloadImage: {
+    position: 'absolute',
+    top: 40,
   },
 });
 
