@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Audio } from 'expo';
 import { connect } from 'react-redux';
 import { socketFalse } from '../store/reducer';
 import ChallengeScreen from './ChallengeScreen';
@@ -18,7 +19,20 @@ class Win extends React.Component {
 
     this.state = {
       restartGame: false,
+      countdown: 1,
     };
+
+    this.gameOverSound = new Expo.Audio.Sound();
+  }
+
+  async componentDidMount() {
+    await this.gameOverSound.loadAsync(
+      require('../assets/sounds/gameover.mp3')
+    );
+
+    setTimeout(() => {
+      this.setState({ countdown: this.state.countdown - 1 });
+    }, 500);
   }
 
   renderChallengeScreen = () => {
@@ -26,6 +40,10 @@ class Win extends React.Component {
   };
 
   render() {
+    if (this.state.countdown === 0) {
+      this.gameOverSound.playAsync();
+    }
+
     if (this.state.restartGame) {
       return <ChallengeScreen />;
     } else {
@@ -44,6 +62,14 @@ class Win extends React.Component {
             <Image
               style={styles.header}
               source={require('../assets/images/header-game-over.png')}
+            />
+          </View>
+
+          {/* You Win */}
+          <View style={styles.youWinView}>
+            <Image
+              style={styles.youWinImage}
+              source={require('../assets/images/you-win.png')}
             />
           </View>
 
@@ -87,6 +113,19 @@ const styles = StyleSheet.create({
     top: 10,
     width: 250,
     height: 250,
+  },
+  youWinView: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  youWinImage: {
+    // position: 'absolute',
+    // top: 300,
+    width: 320,
+    height: 160,
   },
 });
 

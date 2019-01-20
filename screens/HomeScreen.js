@@ -27,12 +27,16 @@ class HomeScreen extends React.Component {
 
   componentDidMount() {
     setInterval(() => {
-      this.setState({ progress: this.state.progress + 0.01 });
+      this.setState({ progress: this.state.progress + 0.0075 });
     }, 10);
 
     setTimeout(() => {
       this.setState({ loading: false });
-    }, 1800);
+    }, 2700);
+  }
+
+  componentWillUnmount() {
+    clearInterval();
   }
 
   render() {

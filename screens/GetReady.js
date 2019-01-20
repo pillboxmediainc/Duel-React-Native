@@ -8,30 +8,89 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Audio } from 'expo';
 import { connect } from 'react-redux';
 import CameraScreen from './CameraScreen';
+
+let interval;
 
 class GetReady extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      countdown: 5,
+      countdown: 6,
       startGame: false,
     };
+
+    this.countdownSound5 = new Expo.Audio.Sound();
+    this.countdownSound4 = new Expo.Audio.Sound();
+    this.countdownSound3 = new Expo.Audio.Sound();
+    this.countdownSound2 = new Expo.Audio.Sound();
+    this.countdownSound1 = new Expo.Audio.Sound();
+    this.battleSound = new Expo.Audio.Sound();
   }
 
-  componentDidMount() {
-    setInterval(() => {
-      this.setState({ countdown: this.state.countdown - 1 });
-    }, 1000);
+  async componentDidMount() {
+    // Load Sounds
+    try {
+      await this.countdownSound5.loadAsync(
+        require('../assets/sounds/countdown.mp3')
+      );
+      await this.countdownSound4.loadAsync(
+        require('../assets/sounds/countdown.mp3')
+      );
+      await this.countdownSound3.loadAsync(
+        require('../assets/sounds/countdown.mp3')
+      );
+      await this.countdownSound2.loadAsync(
+        require('../assets/sounds/countdown.mp3')
+      );
+      await this.countdownSound1.loadAsync(
+        require('../assets/sounds/countdown.mp3')
+      );
+      await this.battleSound.loadAsync(require('../assets/sounds/battle.mp3'));
+    } catch (error) {
+      // An error occurred!
+    }
 
+    // Countdown timers
     setTimeout(() => {
-      this.setState({ startGame: true });
-    }, 6000);
+      this.setState({ countdown: this.state.countdown - 1 });
+      interval = setInterval(() => {
+        this.setState({ countdown: this.state.countdown - 1 });
+      }, 1);
+
+      setTimeout(() => {
+        this.setState({ startGame: true });
+      }, 6);
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(interval);
   }
 
   render() {
+    // if (this.state.countdown === 5) {
+    //   this.countdownSound5.playAsync();
+    // }
+    // if (this.state.countdown === 4) {
+    //   this.countdownSound4.playAsync();
+    // }
+    // if (this.state.countdown === 3) {
+    //   this.countdownSound3.playAsync();
+    // }
+    // if (this.state.countdown === 2) {
+    //   this.countdownSound2.playAsync();
+    // }
+    // if (this.state.countdown === 1) {
+    //   this.countdownSound1.playAsync();
+    // }
+    // if (this.state.countdown === 0) {
+    //   this.battleSound.playAsync();
+    // }
+
     if (this.state.startGame) {
       return <CameraScreen />;
     } else {
@@ -100,10 +159,10 @@ class GetReady extends React.Component {
             </View>
           ) : null}
           {this.state.countdown === 0 ? (
-            <View style={styles.splashView}>
+            <View style={styles.battleView}>
               <Image
-                style={styles.splashImage}
-                source={require('../assets/images/splash-battle.png')}
+                style={styles.battleImage}
+                source={require('../assets/images/battle.png')}
               />
             </View>
           ) : null}
@@ -151,14 +210,14 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
   },
-  splashView: {
+  battleView: {
     position: 'absolute',
     width: '100%',
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  splashImage: {
+  battleImage: {
     // position: 'absolute',
     // top: 200,
     width: 360,
