@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Image,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, Text, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { connect } from 'react-redux';
 import { socketTrue } from '../store/reducer';
 import Settings from './Settings';
@@ -72,7 +64,7 @@ class ChallengeScreen extends React.Component {
 
           {/* How to Play Button */}
           <TouchableOpacity
-            onPress={this.renderHowToPlay}
+            onPress={() => this.renderHowToPlay()}
             style={styles.button2}
           >
             <Image
@@ -83,7 +75,7 @@ class ChallengeScreen extends React.Component {
 
           {/* Settings Button */}
           <TouchableOpacity
-            onPress={this.renderSettings}
+            onPress={() => this.renderSettings()}
             style={styles.button3}
           >
             <Image

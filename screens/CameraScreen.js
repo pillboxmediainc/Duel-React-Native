@@ -1,5 +1,12 @@
 import React from 'react';
-import { Text, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import {
+  Text,
+  View,
+  Vibration,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+} from 'react-native';
 import { Camera, Permissions, Constants, FaceDetector } from 'expo';
 import { connect } from 'react-redux';
 import { Audio } from 'expo';
@@ -139,6 +146,7 @@ class CameraScreen extends React.Component {
     ) {
       // console.log('hit');
 
+      Vibration.vibrate(100);
       this.hitSound.setPositionAsync(0);
       this.hitSound.playAsync();
       // this.hitSound.setPositionAsync(0);
@@ -264,6 +272,7 @@ class CameraScreen extends React.Component {
               source={require('../assets/images/crosshairs.png')}
             />
             <View onLayout={this.setCenter} style={styles.centerPixel} />
+
             {/* Splat */}
             {this.state.showSplat && this.state.splat === 0 ? (
               <View>
@@ -332,11 +341,10 @@ class CameraScreen extends React.Component {
 
           {/* Fire Hydrant Icon */}
           <TouchableOpacity
-            style={styles.hydrantView}
             onPress={() => this.reload()}
+            style={styles.hydrantView}
           >
             <Image
-              onPress={this.reload}
               style={styles.hydrantImage}
               source={require('../assets/images/hydrant.png')}
             />
