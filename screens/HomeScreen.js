@@ -30,7 +30,7 @@ class HomeScreen extends React.Component {
     setTimeout(() => {
       this.setState({ progressBar: true });
       this.statusBar();
-    }, 1000);
+    }, 0);
   }
   componentWillUnmount() {
     clearInterval();
@@ -38,12 +38,12 @@ class HomeScreen extends React.Component {
 
   statusBar = () => {
     setInterval(() => {
-      this.setState({ progress: this.state.progress + 0.025 });
+      this.setState({ progress: this.state.progress + 0.01 });
     }, 10);
 
     setTimeout(() => {
       this.setState({ loading: false });
-    }, 700);
+    }, 1700);
   };
 
   render() {

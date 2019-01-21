@@ -53,15 +53,17 @@ class GetReady extends React.Component {
     setTimeout(() => {
       this.setState({ countdown: this.state.countdown - 1 });
       interval = setInterval(() => {
-        this.setState({ countdown: this.state.countdown - 1 });
+        if (this.state.countdown > 0) {
+          this.setState({ countdown: this.state.countdown - 1 });
+        }
       }, 1000);
 
       setTimeout(() => {
         this.setState({ countdown: this.state.countdown - 1 });
         this.setState({ startGame: true });
         clearInterval(interval);
-      }, 7000);
-    }, 1000);
+      }, 8300);
+    }, 0);
   }
 
   componentDidUpdate() {
@@ -77,7 +79,7 @@ class GetReady extends React.Component {
     if (this.state.countdown > 0 && this.state.countdown < 6) {
       this.countdownSound.setPositionAsync(0);
       this.countdownSound.playAsync();
-      // this.countdownSound.setPositionAsync(0);
+      this.countdownSound.setPositionAsync(0);
       // Vibration.vibrate(100);
     }
     if (this.state.countdown < 1) {
