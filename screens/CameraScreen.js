@@ -212,6 +212,11 @@ class CameraScreen extends React.Component {
     }
   }
 
+  endGame = () => {
+    this.socket.disconnect(true);
+    this.props.socketFalse();
+  };
+
   render() {
     const { hasCameraPermission } = this.state;
 
@@ -326,7 +331,7 @@ class CameraScreen extends React.Component {
           {/* End Game Button */}
           <TouchableOpacity
             style={styles.endGameButtonView}
-            onPress={this.props.socketFalse}
+            onPress={() => this.endGame()}
           >
             <Text style={styles.endGameButtonText}>+</Text>
           </TouchableOpacity>

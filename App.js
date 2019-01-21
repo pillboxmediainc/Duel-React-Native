@@ -88,6 +88,8 @@ export default class App extends React.Component {
         require('./assets/sounds/shoot-empty.mp3'),
         require('./assets/sounds/shoot.mp3'),
         require('./assets/sounds/splash-royale.mp3'),
+        require('./assets/sounds/you-lose.mp3'),
+        require('./assets/sounds/you-win.mp3'),
       ]),
       Font.loadAsync({
         // This is the font that we are using for our tab bar

@@ -24,6 +24,7 @@ class Lose extends React.Component {
 
     this.gameOverSound = new Expo.Audio.Sound();
     this.gameOverVoiceSound = new Expo.Audio.Sound();
+    this.youLoseSound = new Expo.Audio.Sound();
   }
 
   async componentDidMount() {
@@ -33,6 +34,7 @@ class Lose extends React.Component {
     await this.gameOverVoiceSound.loadAsync(
       require('../assets/sounds/game-over-voice.mp3')
     );
+    await this.youLoseSound.loadAsync(require('../assets/sounds/you-lose.mp3'));
 
     setTimeout(() => {
       this.setState({ countdown: this.state.countdown - 1 });
@@ -46,9 +48,13 @@ class Lose extends React.Component {
   render() {
     if (this.state.countdown === 0) {
       this.gameOverVoiceSound.playAsync();
+
       setTimeout(() => {
-        this.gameOverSound.playAsync();
-      }, 1000);
+        this.youLoseSound.playAsync();
+        setTimeout(() => {
+          this.gameOverSound.playAsync();
+        }, 200);
+      }, 1500);
     }
 
     if (this.state.restartGame) {
