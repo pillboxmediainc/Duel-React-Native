@@ -2,8 +2,13 @@ import React from 'react';
 import { Text, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Camera, Permissions, Constants, FaceDetector } from 'expo';
 import { connect } from 'react-redux';
+import { Audio } from 'expo';
 import { socketFalse } from '../store/reducer';
 import ShotIcons from '../components/ShotIcons';
+import XYCoords from '../components/XYCoords';
+import HitOrMiss from '../components/HitOrMiss';
+import HitReload from '../components/HitReload';
+import Win from './Win';
 
 class CameraScreen extends React.Component {
   constructor(props) {
@@ -14,20 +19,44 @@ class CameraScreen extends React.Component {
       type: Camera.Constants.Type.back,
       faces: null,
       hit: null,
+      hitCount: 0,
       isWinner: false,
-      shotsRemaining: this.props.shotsRemaining,
+      shotsRemaining: null,
       opponentEmpty: false,
       centerX: null,
       centerY: null,
       faceX: null,
       faceY: null,
+      reload: false,
+      splat: 0,
+      showSplat: false,
     };
+
+    this.shootSound = new Expo.Audio.Sound();
+    this.shootEmptySound = new Expo.Audio.Sound();
+    this.reloadSound = new Expo.Audio.Sound();
+    this.reloadVoiceSound = new Expo.Audio.Sound();
+    this.hitSound = new Expo.Audio.Sound();
   }
 
   async componentDidMount() {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA);
-    this.setState({ hasCameraPermission: status === 'granted' });
-    console.log('build complete');
+    try {
+      const { status } = await Permissions.askAsync(Permissions.CAMERA);
+      this.setState({ hasCameraPermission: status === 'granted' });
+      this.setState({ shotsRemaining: this.props.shotsRemaining });
+
+      await this.shootSound.loadAsync(require('../assets/sounds/shoot.mp3'));
+      await this.shootEmptySound.loadAsync(
+        require('../assets/sounds/shoot-empty.mp3')
+      );
+      await this.reloadSound.loadAsync(require('../assets/sounds/reload.mp3'));
+      await this.reloadVoiceSound.loadAsync(
+        require('../assets/sounds/reload-voice.mp3')
+      );
+      await this.hitSound.loadAsync(require('../assets/sounds/hit.mp3'));
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   componentDidUpdate() {
@@ -89,9 +118,7 @@ class CameraScreen extends React.Component {
   }
 
   renderFaces = () => (
-    // <View style={styles.facesContainer} pointerEvents="none">
     //   {this.state.faces ? this.state.faces.map(this.renderFace) : ''}
-    // </View>
     <View style={styles.facesContainer} pointerEvents="none">
       {this.state.faces ? this.renderFace(this.state.faces[0]) : ''}
     </View>
@@ -99,6 +126,7 @@ class CameraScreen extends React.Component {
 
   fire() {
     if (
+      this.state.shotsRemaining > 0 &&
       this.state.faces &&
       this.state.faceX < this.state.centerX &&
       this.state.faceY < this.state.centerY &&
@@ -109,18 +137,62 @@ class CameraScreen extends React.Component {
         parseInt(this.state.faces[0].bounds.size.height.toFixed(0) + 400) >=
         this.state.centerY
     ) {
-      console.log('hit');
-      this.setState({ hit: true });
+      // console.log('hit');
+
+      this.hitSound.setPositionAsync(0);
+      this.hitSound.playAsync();
+      // this.hitSound.setPositionAsync(0);
+      this.setState({ hit: true, hitCount: this.state.hitCount + 1 });
+      setTimeout(() => {
+        this.setState({ hit: null });
+      }, 1000);
     } else {
-      console.log('miss');
+      // console.log('miss');
       this.setState({ hit: false });
     }
+    if (this.state.shotsRemaining > 0) {
+      this.shootSound.setPositionAsync(0);
+      this.shootSound.playAsync();
+      // this.shootSound.setPositionAsync(0);
+      this.setState({ splat: (this.state.splat + 1) % 4 });
+      this.setState({ showSplat: true });
 
-    this.setState({ shotsRemaining: this.state.shotsRemaining - 1 });
+      setTimeout(() => {
+        this.setState({ showSplat: false });
+      }, 500);
+      this.setState({ shotsRemaining: this.state.shotsRemaining - 1 });
+    }
+
+    if (this.state.shotsRemaining < 1) {
+      this.shootEmptySound.setPositionAsync(0);
+      this.shootEmptySound.playAsync();
+      // this.shootEmptySound.setPositionAsync(0);
+
+      this.reloadVoiceSound.setPositionAsync(0);
+      this.reloadVoiceSound.playAsync();
+      // this.reloadVoiceSound.setPositionAsync(0);
+      this.setState({ reload: true });
+      setTimeout(() => {
+        this.setState({ reload: false });
+      }, 600);
+    }
+  }
+
+  async reload() {
+    this.setState({ shotsRemaining: this.props.shotsRemaining });
+
+    try {
+      this.reloadSound.setPositionAsync(0);
+      await this.reloadSound.playAsync();
+      // this.reloadSound.setPositionAsync(0);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   render() {
     const { hasCameraPermission } = this.state;
+
     if (hasCameraPermission === null) {
       return <View />;
     } else if (hasCameraPermission === false) {
@@ -130,6 +202,8 @@ class CameraScreen extends React.Component {
           to I Challenge You to a Duel
         </Text>
       );
+    } else if (this.state.hitCount === this.props.hitsToWin) {
+      return <Win />;
     } else {
       return (
         <View
@@ -154,83 +228,90 @@ class CameraScreen extends React.Component {
             ? this.renderFaces()
             : undefined}
 
-          {/* XY Coordinate Display */}
-          <View style={styles.xyCoords}>
-            <Text style={styles.textcolor}>
-              CenterX:{' '}
-              {this.state.faces && this.state.faces.length
-                ? this.state.centerX
-                : 'null'}
-            </Text>
-            <Text style={styles.textcolor}>
-              TopLeftFaceX:{' '}
-              {this.state.faces && this.state.faces.length && this.state.faceX
-                ? this.state.faceX
-                : 'null'}
-            </Text>
-            <Text style={styles.textcolor}>
-              Width:{' '}
-              {this.state.faces && this.state.faces.length
-                ? this.state.faces[0].bounds.size.width.toFixed(0)
-                : 'null'}
-            </Text>
-            {/* <Text style={styles.textcolor}>
-              TopRightX:{' '}
-              {this.state.faces && this.state.faces.length && this.state.faceX
-                ? parseInt(this.state.faceX) +
-                  parseInt(this.state.faces[0].bounds.size.width.toFixed(0))
-                : 'null'}
-            </Text> */}
-            <Text style={styles.textcolor}>
-              CenterY:{' '}
-              {this.state.faces && this.state.faces.length
-                ? this.state.centerY
-                : 'null'}
-            </Text>
-            <Text style={styles.textcolor}>
-              TopLeftFaceY:{' '}
-              {this.state.faces && this.state.faces.length && this.state.faceX
-                ? this.state.faceY
-                : 'null'}
-            </Text>
-            {/* <Text style={styles.textcolor}>
-              BottomLeftY:{' '}
-              {this.state.faces && this.state.faces.length && this.state.faceX
-                ? parseInt(this.state.faceY) +
-                  parseInt(this.state.faces[0].bounds.size.height.toFixed(0))
-                : 'null'}
-            </Text> */}
-            <Text style={styles.textcolor}>
-              Height:{' '}
-              {this.state.faces && this.state.faces.length
-                ? this.state.faces[0].bounds.size.height.toFixed(0)
-                : 'null'}
-            </Text>
-          </View>
+          {/* XY DebuggingConsole */}
+          {/* <XYCoords state={this.state} styles={styles} /> */}
 
           {/* Hit or Miss Text Render */}
-          <View style={styles.hitOrMissView}>
-            <Text style={styles.hitOrMissText}>
-              {`${this.state.hit ? 'hit' : 'miss'}`}
-            </Text>
-          </View>
+          {/* <HitOrMiss state={this.state} styles={styles} /> */}
+
+          {/* Hit Animated Gif */}
+          {this.state.hit ? (
+            <View style={styles.hitReloadView}>
+              <Image
+                style={styles.hitReloadImage}
+                source={require('../assets/images/HIT.png')}
+              />
+            </View>
+          ) : null}
+
+          {/* Reload Animated Gif */}
+          {this.state.reload ? (
+            <View style={styles.hitReloadView}>
+              <Image
+                style={styles.hitReloadImage}
+                source={require('../assets/images/RELOAD.png')}
+              />
+            </View>
+          ) : null}
 
           {/* Crosshairs */}
-          <View style={styles.crosshairsView}>
+          <TouchableOpacity
+            onPress={() => this.fire()}
+            style={styles.crosshairsView}
+          >
             <Image
               style={styles.crosshairsImage}
               source={require('../assets/images/crosshairs.png')}
             />
             <View onLayout={this.setCenter} style={styles.centerPixel} />
-          </View>
-
+            {/* Splat */}
+            {this.state.showSplat && this.state.splat === 0 ? (
+              <View>
+                <Image
+                  style={styles.splateImage1}
+                  source={require('../assets/images/splat1.png')}
+                />
+              </View>
+            ) : null}
+            {this.state.showSplat && this.state.splat === 1 ? (
+              <View>
+                <Image
+                  style={styles.splateImage2}
+                  source={require('../assets/images/splat2.png')}
+                />
+              </View>
+            ) : null}
+            {this.state.showSplat && this.state.splat === 2 ? (
+              <View>
+                <Image
+                  style={styles.splateImage3}
+                  source={require('../assets/images/splat3.png')}
+                />
+              </View>
+            ) : null}
+            {this.state.showSplat && this.state.splat === 3 ? (
+              <View>
+                <Image
+                  style={styles.splateImage4}
+                  source={require('../assets/images/splat4.png')}
+                />
+              </View>
+            ) : null}
+          </TouchableOpacity>
           {/* End Game Button */}
           <TouchableOpacity
             style={styles.endGameButtonView}
-            onPress={() => this.props.socketFalse()}
+            onPress={this.props.socketFalse}
           >
-            <Text style={styles.endGameButtonText}> Home </Text>
+            <Text style={styles.endGameButtonText}>+</Text>
           </TouchableOpacity>
+
+          {/* Score */}
+          <View style={styles.scoreView} onPress={this.props.socketFalse}>
+            <Text style={styles.scoreText}>
+              Hits to Win: {this.props.hitsToWin - this.state.hitCount}
+            </Text>
+          </View>
 
           {/* Fire Button */}
           <TouchableOpacity
@@ -248,6 +329,18 @@ class CameraScreen extends React.Component {
             shotsRemaining={this.state.shotsRemaining}
             styles={styles}
           />
+
+          {/* Fire Hydrant Icon */}
+          <TouchableOpacity
+            style={styles.hydrantView}
+            onPress={() => this.reload()}
+          >
+            <Image
+              onPress={this.reload}
+              style={styles.hydrantImage}
+              source={require('../assets/images/hydrant.png')}
+            />
+          </TouchableOpacity>
         </View>
       );
     }
@@ -262,17 +355,12 @@ const styles = StyleSheet.create({
   camera: {
     height: '100%',
     width: '100%',
-    // flex: 1,
-    // justifyContent: 'space-between',
   },
   xyCoords: {
     position: 'absolute',
     backgroundColor: 'white',
     top: 30,
     left: 30,
-    // flexDirection: 'row',
-    // justifyContent: 'space-bet',
-    // paddingTop: Constants.statusBarHeight + 1,
   },
   faceBox: {
     position: 'absolute',
@@ -291,11 +379,11 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   face: {
-    padding: 1,
+    padding: -10,
     borderWidth: 1,
-    borderRadius: 2,
+    borderRadius: 100,
     position: 'absolute',
-    borderColor: 'yellow',
+    borderColor: 'red',
     justifyContent: 'center',
     backgroundColor: 'transparent',
   },
@@ -310,10 +398,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
-    // bottom: 0,
-    // right: 0,
-    // left: 0,
-    // top: 0,
   },
   textcolor: {
     color: 'black',
@@ -325,7 +409,6 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'transparent',
   },
-  fireButtonText: { fontSize: 28, color: 'red' },
   fireButtonImage: {
     width: 225,
     height: 145,
@@ -352,27 +435,26 @@ const styles = StyleSheet.create({
     height: 1,
     borderRadius: 1,
   },
-  // testPixel: {
-  //   position: 'absolute',
-  //   top: 284,
-  //   left: 160,
-  //   backgroundColor: 'yellow',
-  //   width: 4,
-  //   height: 4,
-  //   borderRadius: 1,
-  // },
   endGameButtonView: {
     position: 'absolute',
-    alignItems: 'center',
-    top: 20,
-    width: '100%',
+    top: -15,
+    right: 0,
     backgroundColor: 'transparent',
   },
-  endGameButtonText: { fontSize: 28, color: 'white' },
-  dropletView: {
+  endGameButtonText: {
+    fontSize: 50,
+    transform: [{ rotate: '45deg' }],
+    color: '#e5262b',
+  },
+  scoreView: {
     position: 'absolute',
-    width: '100%',
-    height: '100%',
+    top: -2,
+    left: 3,
+    backgroundColor: 'transparent',
+  },
+  scoreText: {
+    fontSize: 28,
+    color: '#0ea8fa',
   },
   dropletImage1: {
     position: 'absolute',
@@ -444,11 +526,62 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
+  // hydrantView: {
+  //   position: 'absolute',
+  //   width: '100%',
+  //   height: '100%',
+  // },
+  hydrantImage: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+    width: 42,
+    height: 100,
+  },
+  hitReloadView: {
+    position: 'absolute',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  hitReloadImage: {
+    position: 'absolute',
+    top: 40,
+  },
+  splatView: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'transparent',
+  },
+  splateImage1: {
+    width: 65,
+    height: 65,
+    backgroundColor: 'transparent',
+  },
+  splateImage2: {
+    width: 50,
+    height: 50,
+    backgroundColor: 'transparent',
+  },
+  splateImage3: {
+    width: 50,
+    height: 50,
+    backgroundColor: 'transparent',
+  },
+  splateImage4: {
+    width: 65,
+    height: 65,
+    backgroundColor: 'transparent',
+  },
 });
 
 const mapState = state => {
   return {
     shotsRemaining: state.shotsRemaining,
+    hitsToWin: state.hitsToWin,
   };
 };
 

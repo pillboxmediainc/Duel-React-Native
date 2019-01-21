@@ -10,54 +10,87 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { socketTrue } from '../store/reducer';
+import Settings from './Settings';
+import HowToPlay from './HowToPlay';
 
 class ChallengeScreen extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      IP: 'http://localhost.com:3000',
-      // IP: 'https://ichallengeyoutoaduel.herokuapp.com'
+      howToPlay: false,
+      settings: false,
     };
   }
 
+  renderHowToPlay = () => {
+    this.setState({ howToPlay: true });
+  };
+
+  renderSettings = () => {
+    this.setState({ settings: true });
+  };
+
   render() {
+    if (this.state.howToPlay) {
+      return <HowToPlay />;
+    }
+
+    if (this.state.settings) {
+      return <Settings />;
+    }
+
     return (
-      <View style={styles.container}>
-        <View
-          style={styles.container}
-          contentContainerStyle={styles.contentContainer}
-        >
-          {/* Game Title */}
-          <View style={styles.gameTitle}>
-            <Text style={styles.tabBarInfoText}>
-              I Challange You to a Duel! v1.0.0
-            </Text>
-          </View>
-
-          {/* Challeng Opponent Button */}
-          <TouchableOpacity
-            onPress={this.props.socketTrue}
-            style={styles.challengeButtonView}
-          >
-            <Text style={styles.challengeButtonText}>Challenge Opponent</Text>
-          </TouchableOpacity>
-
-          {/* Accept Challenge Button */}
-          <TouchableOpacity
-            onPress={this.props.socketTrue}
-            style={styles.acceptChallengeButtonView}
-          >
-            <Text style={styles.acceptChallengeButtonText}>
-              Accept Challenge
-            </Text>
-          </TouchableOpacity>
+      <View style={styles.mainView}>
+        {/* Background Image */}
+        <View style={styles.backgroundImage}>
+          <Image
+            style={styles.backgroundImage}
+            source={require('../assets/images/pool-animation.gif')}
+          />
         </View>
 
-        <View style={styles.bottomInfo}>
-          <Text style={styles.tabBarInfoText}>
-            Challenge an Opponent to a duel!
-          </Text>
+        {/* Splash Royale Logo */}
+        <View style={styles.logo}>
+          <Image
+            style={styles.logo}
+            source={require('../assets/images/splash-royale-logo.png')}
+          />
+        </View>
+
+        <View style={styles.buttonContainer}>
+          {/* Join Game Button */}
+          <TouchableOpacity
+            onPress={this.props.socketTrue}
+            style={styles.button1}
+          >
+            <Image
+              source={require('../assets/images/button-join-game.png')}
+              style={styles.button1}
+            />
+          </TouchableOpacity>
+
+          {/* How to Play Button */}
+          <TouchableOpacity
+            onPress={this.renderHowToPlay}
+            style={styles.button2}
+          >
+            <Image
+              source={require('../assets/images/button-how-to-play.png')}
+              style={styles.button2}
+            />
+          </TouchableOpacity>
+
+          {/* Settings Button */}
+          <TouchableOpacity
+            onPress={this.renderSettings}
+            style={styles.button3}
+          >
+            <Image
+              source={require('../assets/images/button-settings.png')}
+              style={styles.button3}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -65,57 +98,12 @@ class ChallengeScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  contentContainer: {
-    paddingTop: 30,
-  },
-  gameTitle: {
+  mainView: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#66b3ff',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 1,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 30,
-      },
-    }),
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
-    backgroundColor: '#c4c4c4',
-    paddingVertical: 30,
-  },
-  bottomInfo: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#66b3ff',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 1,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 30,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#c4c4c4',
-    paddingVertical: 30,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
+    justifyContent: 'center',
   },
   challengeButtonView: {
     marginTop: 175,
@@ -129,17 +117,41 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2e78b7',
   },
-  acceptChallengeButtonView: {
-    marginTop: 20,
-    width: '100%',
-    height: 100,
-    backgroundColor: '#66b3ff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  logo: {
+    position: 'absolute',
+    top: 10,
+    width: 250,
+    height: 250,
   },
-  acceptChallengeButtonText: {
-    fontSize: 14,
-    color: '#2e78b7',
+  buttonContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  button1: {
+    position: 'absolute',
+    marginTop: 40,
+    width: 200,
+    height: 62,
+  },
+  button2: {
+    position: 'absolute',
+    marginTop: 120,
+    width: 200,
+    height: 62,
+  },
+  button3: {
+    position: 'absolute',
+    marginTop: 200,
+    width: 200,
+    height: 62,
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
   },
 });
 

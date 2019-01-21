@@ -5,21 +5,67 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  ProgressViewIOS,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { WebBrowser } from 'expo';
-import { MonoText } from '../components/StyledText';
+// import { WebBrowser } from 'expo';
+// import { MonoText } from '../components/StyledText';
 import ChallengeScreen from './ChallengeScreen';
-import CameraScreen from './CameraScreen';
+import GetReady from './GetReady';
 import { connect } from 'react-redux';
 
 class HomeScreen extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      loading: false,
+      progress: 0,
+    };
+  }
+
+  componentDidMount() {
+    setInterval(() => {
+      this.setState({ progress: this.state.progress + 0.0075 });
+    }, 10);
+
+    setTimeout(() => {
+      this.setState({ loading: false });
+    }, 2700);
+  }
+
+  componentWillUnmount() {
+    clearInterval();
+  }
+
   render() {
+    if (this.state.loading) {
+      return (
+        <View style={styles.mainView}>
+          <View style={styles.logoAndLoading}>
+            <Image
+              style={styles.logo}
+              source={require('../assets/images/Pillbox-Media-Inc-Logo.png')}
+            />
+            <ProgressViewIOS
+              style={styles.progressBar}
+              trackTintColor="black"
+              progressViewStyle="default"
+              progress={this.state.progress}
+            />
+            {/* <Text style={styles.loading}>Loading...</Text> */}
+          </View>
+          <View style={styles.copyRight}>
+            <Text>&copy;2019 Pillbox Media, Inc.</Text>
+          </View>
+        </View>
+      );
+    }
     if (!this.props.socketConnection) {
       return <ChallengeScreen />;
     } else {
-      return <CameraScreen />;
+      return <GetReady />;
     }
   }
 
@@ -60,93 +106,32 @@ class HomeScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  // container: {
-  //   flex: 1,
-  //   backgroundColor: '#fff',
-  // },
-  // developmentModeText: {
-  //   marginBottom: 20,
-  //   color: 'rgba(0,0,0,0.4)',
-  //   fontSize: 14,
-  //   lineHeight: 19,
-  //   textAlign: 'center',
-  // },
-  // contentContainer: {
-  //   paddingTop: 30,
-  // },
-  // welcomeContainer: {
-  //   alignItems: 'center',
-  //   marginTop: 10,
-  //   marginBottom: 20,
-  // },
-  // welcomeImage: {
-  //   width: 100,
-  //   height: 80,
-  //   resizeMode: 'contain',
-  //   marginTop: 3,
-  //   marginLeft: -10,
-  // },
-  // getStartedContainer: {
-  //   alignItems: 'center',
-  //   marginHorizontal: 50,
-  // },
-  // homeScreenFilename: {
-  //   marginVertical: 7,
-  // },
-  // codeHighlightText: {
-  //   color: 'rgba(96,100,109, 0.8)',
-  // },
-  // codeHighlightContainer: {
-  //   backgroundColor: 'rgba(0,0,0,0.05)',
-  //   borderRadius: 3,
-  //   paddingHorizontal: 4,
-  // },
-  // gameTitle: {
-  //   fontSize: 17,
-  //   color: 'rgba(96,100,109, 1)',
-  //   lineHeight: 24,
-  //   textAlign: 'center',
-  //   marginVertical: 90,
-  // },
-  // tabBarInfoContainer: {
-  //   position: 'absolute',
-  //   bottom: 0,
-  //   left: 0,
-  //   right: 0,
-  //   ...Platform.select({
-  //     ios: {
-  //       shadowColor: 'black',
-  //       shadowOffset: { height: -3 },
-  //       shadowOpacity: 0.1,
-  //       shadowRadius: 3,
-  //     },
-  //     android: {
-  //       elevation: 20,
-  //     },
-  //   }),
-  //   alignItems: 'center',
-  //   backgroundColor: '#fbfbfb',
-  //   paddingVertical: 20,
-  // },
-  // tabBarInfoText: {
-  //   fontSize: 17,
-  //   color: 'rgba(96,100,109, 1)',
-  //   textAlign: 'center',
-  // },
-  // navigationFilename: {
-  //   marginTop: 5,
-  // },
-  // helpContainer: {
-  //   marginTop: 15,
-  //   alignItems: 'center',
-  // },
-  // helpLink: {
-  //   paddingVertical: 15,
-  // },
-  // helpLinkText: {
-  //   fontSize: 14,
-  //   color: '#2e78b7',
-  // },
+  mainView: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+    backgroundColor: '#fcfcfc',
+    alignItems: 'center',
+  },
+  logoAndLoading: {
+    alignItems: 'center',
+    position: 'absolute',
+    top: 100,
+  },
+  logo: {
+    width: 250,
+    height: 150,
+  },
+  loading: {},
+  copyRight: {
+    position: 'absolute',
+    bottom: 5,
+  },
+  progressBar: {
+    paddingTop: 50,
+    width: 100,
+    transform: [{ scaleX: 1.0 }, { scaleY: 2.5 }],
+  },
 });
 
 const mapState = state => {
