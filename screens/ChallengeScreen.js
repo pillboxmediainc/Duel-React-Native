@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { socketTrue } from '../store/reducer';
-import { getCalendarsAsync } from 'expo/build/Calendar';
 import Settings from './Settings';
 import HowToPlay from './HowToPlay';
 
