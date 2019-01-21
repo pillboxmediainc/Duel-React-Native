@@ -1,8 +1,7 @@
 import React from 'react';
 import {
   Image,
-  Platform,
-  ScrollView,
+  Vibration,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -58,6 +57,7 @@ class GetReady extends React.Component {
       }, 1000);
 
       setTimeout(() => {
+        this.setState({ countdown: this.state.countdown - 1 });
         this.setState({ startGame: true });
         clearInterval(interval);
       }, 7000);
@@ -77,11 +77,16 @@ class GetReady extends React.Component {
     if (this.state.countdown > 0 && this.state.countdown < 6) {
       this.countdownSound.setPositionAsync(0);
       this.countdownSound.playAsync();
-      this.countdownSound.setPositionAsync(0);
+      // this.countdownSound.setPositionAsync(0);
+      // Vibration.vibrate(100);
     }
     if (this.state.countdown < 1) {
       this.splashRoyaleSound.playAsync();
       this.battleSound.playAsync();
+    }
+
+    if (this.state.countdown === 0) {
+      Vibration.vibrate(100);
     }
 
     if (this.state.startGame) {

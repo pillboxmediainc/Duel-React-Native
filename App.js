@@ -7,6 +7,7 @@ import { createStore } from 'redux';
 import reducer from './store/reducer';
 import HomeScreen from './screens/HomeScreen';
 
+console.disableYellowBox = true;
 const store = createStore(reducer);
 
 export default class App extends React.Component {

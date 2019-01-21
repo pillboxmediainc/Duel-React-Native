@@ -20,24 +20,31 @@ class HomeScreen extends React.Component {
     super();
 
     this.state = {
-      loading: false,
+      loading: true,
       progress: 0,
+      progressBar: false,
     };
   }
 
   componentDidMount() {
+    setTimeout(() => {
+      this.setState({ progressBar: true });
+      this.statusBar();
+    }, 1000);
+  }
+  componentWillUnmount() {
+    clearInterval();
+  }
+
+  statusBar = () => {
     setInterval(() => {
-      this.setState({ progress: this.state.progress + 0.0075 });
+      this.setState({ progress: this.state.progress + 0.025 });
     }, 10);
 
     setTimeout(() => {
       this.setState({ loading: false });
-    }, 2700);
-  }
-
-  componentWillUnmount() {
-    clearInterval();
-  }
+    }, 700);
+  };
 
   render() {
     if (this.state.loading) {
@@ -48,13 +55,16 @@ class HomeScreen extends React.Component {
               style={styles.logo}
               source={require('../assets/images/Pillbox-Media-Inc-Logo.png')}
             />
-            <ProgressViewIOS
-              style={styles.progressBar}
-              trackTintColor="black"
-              progressViewStyle="default"
-              progress={this.state.progress}
-            />
-            {/* <Text style={styles.loading}>Loading...</Text> */}
+
+            {/* Progress Bar */}
+            {this.state.progressBar ? (
+              <ProgressViewIOS
+                style={styles.progressBar}
+                trackTintColor="black"
+                progressViewStyle="default"
+                progress={this.state.progress}
+              />
+            ) : null}
           </View>
           <View style={styles.copyRight}>
             <Text>&copy;2019 Pillbox Media, Inc.</Text>

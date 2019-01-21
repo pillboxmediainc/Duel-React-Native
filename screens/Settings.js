@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   hitsText: {
     position: 'absolute',
     marginTop: 180,
-    color: '#ffffff',
+    color: '#ccfffe',
     fontWeight: 'bold',
   },
   invisible: {
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   shotsText: {
     position: 'absolute',
     marginTop: 325,
-    color: '#ffffff',
+    color: '#ccfffe',
     fontWeight: 'bold',
   },
   shotsPlus: {
