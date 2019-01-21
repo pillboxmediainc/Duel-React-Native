@@ -16,6 +16,8 @@ import XYCoords from '../components/XYCoords';
 import HitOrMiss from '../components/HitOrMiss';
 import HitReload from '../components/HitReload';
 import Win from './Win';
+import Lose from './Lose';
+import io from 'socket.io-client';
 
 class CameraScreen extends React.Component {
   constructor(props) {
@@ -28,6 +30,7 @@ class CameraScreen extends React.Component {
       hit: null,
       hitCount: 0,
       isWinner: false,
+      isLoser: false,
       shotsRemaining: null,
       opponentEmpty: false,
       centerX: null,
@@ -44,9 +47,21 @@ class CameraScreen extends React.Component {
     this.reloadSound = new Expo.Audio.Sound();
     this.reloadVoiceSound = new Expo.Audio.Sound();
     this.hitSound = new Expo.Audio.Sound();
+
+    this.socket = io('http://192.168.1.253:3000');
+    // this.socket = io('https://ichallengeyoutoaduel.herokuapp.com');
   }
 
   async componentDidMount() {
+    this.socket.on('join-game', () => {
+      console.log('We read you loud and clear, Socket. Over.');
+    });
+    this.socket.on('youlose', () => {
+      console.log('registered you lose from server');
+      this.socket.disconnect(true);
+      this.setState({ isLoser: true });
+    });
+
     try {
       const { status } = await Permissions.askAsync(Permissions.CAMERA);
       this.setState({ hasCameraPermission: status === 'granted' });
@@ -64,13 +79,6 @@ class CameraScreen extends React.Component {
     } catch (error) {
       console.error(error);
     }
-  }
-
-  componentDidUpdate() {
-    // console.log('center x:', this.state.centerX);
-    // console.log('center y:', this.state.centerY);
-    // console.log('face x:', this.state.faceX);
-    // console.log('face y:', this.state.faceY);
   }
 
   setCenter = e => {
@@ -131,7 +139,7 @@ class CameraScreen extends React.Component {
     </View>
   );
 
-  fire() {
+  fire = () => {
     if (
       this.state.shotsRemaining > 0 &&
       this.state.faces &&
@@ -149,8 +157,14 @@ class CameraScreen extends React.Component {
       Vibration.vibrate(100);
       this.hitSound.setPositionAsync(0);
       this.hitSound.playAsync();
-      // this.hitSound.setPositionAsync(0);
+      this.hitSound.setPositionAsync(0);
       this.setState({ hit: true, hitCount: this.state.hitCount + 1 });
+
+      if (this.state.hitCount === this.props.hitsToWin - 1) {
+        this.socket.emit('iwin');
+        this.socket.disconnect(true);
+        this.setState({ isWinner: true });
+      }
       setTimeout(() => {
         this.setState({ hit: null });
       }, 1000);
@@ -161,7 +175,7 @@ class CameraScreen extends React.Component {
     if (this.state.shotsRemaining > 0) {
       this.shootSound.setPositionAsync(0);
       this.shootSound.playAsync();
-      // this.shootSound.setPositionAsync(0);
+      this.shootSound.setPositionAsync(0);
       this.setState({ splat: (this.state.splat + 1) % 4 });
       this.setState({ showSplat: true });
 
@@ -174,17 +188,17 @@ class CameraScreen extends React.Component {
     if (this.state.shotsRemaining < 1) {
       this.shootEmptySound.setPositionAsync(0);
       this.shootEmptySound.playAsync();
-      // this.shootEmptySound.setPositionAsync(0);
+      this.shootEmptySound.setPositionAsync(0);
 
       this.reloadVoiceSound.setPositionAsync(0);
       this.reloadVoiceSound.playAsync();
-      // this.reloadVoiceSound.setPositionAsync(0);
+      this.reloadVoiceSound.setPositionAsync(0);
       this.setState({ reload: true });
       setTimeout(() => {
         this.setState({ reload: false });
       }, 600);
     }
-  }
+  };
 
   async reload() {
     this.setState({ shotsRemaining: this.props.shotsRemaining });
@@ -192,7 +206,7 @@ class CameraScreen extends React.Component {
     try {
       this.reloadSound.setPositionAsync(0);
       await this.reloadSound.playAsync();
-      // this.reloadSound.setPositionAsync(0);
+      this.reloadSound.setPositionAsync(0);
     } catch (error) {
       console.error(error);
     }
@@ -210,8 +224,10 @@ class CameraScreen extends React.Component {
           to I Challenge You to a Duel
         </Text>
       );
-    } else if (this.state.hitCount === this.props.hitsToWin) {
+    } else if (this.state.isWinner) {
       return <Win />;
+    } else if (this.state.isLoser) {
+      return <Lose />;
     } else {
       return (
         <View

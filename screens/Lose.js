@@ -76,7 +76,7 @@ class Lose extends React.Component {
           <View style={styles.youLoseView}>
             <Image
               style={styles.youLoseImage}
-              source={require('../assets/images/you-win.png')}
+              source={require('../assets/images/you-lose.png')}
             />
           </View>
 
