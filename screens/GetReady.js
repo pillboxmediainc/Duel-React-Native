@@ -60,7 +60,7 @@ class GetReady extends React.Component {
       setTimeout(() => {
         this.setState({ startGame: true });
         clearInterval(interval);
-      }, 8000);
+      }, 7000);
     }, 1000);
   }
 

@@ -82,9 +82,9 @@ const styles = StyleSheet.create({
   },
   header: {
     position: 'absolute',
-    top: 10,
-    width: 250,
-    height: 250,
+    top: 5,
+    width: 290,
+    height: 290,
   },
   rulesView: {
     position: 'absolute',

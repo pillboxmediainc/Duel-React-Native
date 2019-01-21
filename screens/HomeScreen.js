@@ -20,7 +20,7 @@ class HomeScreen extends React.Component {
     super();
 
     this.state = {
-      loading: true,
+      loading: false,
       progress: 0,
     };
   }
