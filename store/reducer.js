@@ -2,8 +2,8 @@ import { combineReducers } from 'redux';
 
 const INITIAL_STATE = {
   socketConnection: false,
-  shotsRemaining: 9,
-  hitsToWin: 1,
+  shotsRemaining: 5,
+  hitsToWin: 3,
 };
 
 //ACTION CONSTANTS

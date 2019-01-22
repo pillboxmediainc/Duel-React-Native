@@ -155,9 +155,11 @@ class CameraScreen extends React.Component {
       // console.log('hit');
 
       Vibration.vibrate(100);
-      this.hitSound.setPositionAsync(0);
-      this.hitSound.playAsync();
-      this.hitSound.setPositionAsync(0);
+      setTimeout(() => {
+        this.hitSound.setPositionAsync(0);
+        this.hitSound.playAsync();
+        this.hitSound.setPositionAsync(0);
+      }, 300);
       this.setState({ hit: true, hitCount: this.state.hitCount + 1 });
 
       if (this.state.hitCount === this.props.hitsToWin - 1) {
@@ -190,9 +192,12 @@ class CameraScreen extends React.Component {
       this.shootEmptySound.playAsync();
       this.shootEmptySound.setPositionAsync(0);
 
-      this.reloadVoiceSound.setPositionAsync(0);
-      this.reloadVoiceSound.playAsync();
-      this.reloadVoiceSound.setPositionAsync(0);
+      setTimeout(() => {
+        this.reloadVoiceSound.setPositionAsync(0);
+        this.reloadVoiceSound.playAsync();
+        this.reloadVoiceSound.setPositionAsync(0);
+      }, 200);
+
       this.setState({ reload: true });
       setTimeout(() => {
         this.setState({ reload: false });
